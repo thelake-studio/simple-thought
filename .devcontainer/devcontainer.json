@@ -1,0 +1,19 @@
+{
+  "name": "Simple Thought - Dev",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/var/www/html",
+  "shutdownAction": "stopCompose",
+  "customizations": {
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "sensiolabs.symfony-vscode-extension",
+        "miku86.twig-beautifier",
+        "xdebug.php-debug"
+      ]
+    }
+  },
+  "remoteUser": "root"
+}

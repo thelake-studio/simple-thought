@@ -1,0 +1,36 @@
+services:
+  # Servidor de Aplicación (PHP + Symfony)
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: simple_thought_app
+    volumes:
+      - ./app:/var/www/html
+    environment:
+      DATABASE_URL: "mysql://root:root@database:3306/simple_thought"
+    depends_on:
+      - database
+
+  # Base de Datos (MySQL)
+  database:
+    image: mysql:8.0
+    container_name: simple_thought_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: simple_thought
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # Gestor de Base de Datos (Opcional pero útil)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: simple_thought_pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: database
+    depends_on:
+      - database

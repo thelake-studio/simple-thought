@@ -1,0 +1,21 @@
+# Symfony
+/app/vendor/
+/app/var/
+/app/public/bundles/
+
+# Configuracion y Secretos
+.env
+.env.*
+/app/.env.local
+/app/.env.*.local
+
+# Infraestructura y Frontend
+/docker/mysql/data/*
+!/docker/mysql/data/.gitkeep
+node_modules/
+
+# IDE y Sistema
+.vscode/
+.history/
+.DS_Store
+Thumbs.db
