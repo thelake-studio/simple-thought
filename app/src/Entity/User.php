@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -39,6 +41,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    /**
+     * @var Collection<int, Emotion>
+     */
+    #[ORM\OneToMany(targetEntity: Emotion::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $emotions;
+
+    public function __construct()
+    {
+        $this->emotions = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -153,6 +166,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Emotion>
+     */
+    public function getEmotions(): Collection
+    {
+        return $this->emotions;
+    }
+
+    public function addEmotion(Emotion $emotion): static
+    {
+        if (!$this->emotions->contains($emotion)) {
+            $this->emotions->add($emotion);
+            $emotion->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEmotion(Emotion $emotion): static
+    {
+        if ($this->emotions->removeElement($emotion)) {
+            // set the owning side to null (unless already changed)
+            if ($emotion->getUser() === $this) {
+                $emotion->setUser(null);
+            }
+        }
 
         return $this;
     }
