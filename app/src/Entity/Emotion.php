@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EmotionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,6 +31,17 @@ class Emotion
     #[ORM\ManyToOne(inversedBy: 'emotions')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, Entry>
+     */
+    #[ORM\OneToMany(targetEntity: Entry::class, mappedBy: 'emotion')]
+    private Collection $entries;
+
+    public function __construct()
+    {
+        $this->entries = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -91,6 +104,36 @@ class Emotion
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Entry>
+     */
+    public function getEntries(): Collection
+    {
+        return $this->entries;
+    }
+
+    public function addEntry(Entry $entry): static
+    {
+        if (!$this->entries->contains($entry)) {
+            $this->entries->add($entry);
+            $entry->setEmotion($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEntry(Entry $entry): static
+    {
+        if ($this->entries->removeElement($entry)) {
+            // set the owning side to null (unless already changed)
+            if ($entry->getEmotion() === $this) {
+                $entry->setEmotion(null);
+            }
+        }
 
         return $this;
     }
