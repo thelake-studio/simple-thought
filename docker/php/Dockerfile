@@ -1,7 +1,6 @@
-# Partimos de PHP 8.2 (FPM es ideal para entornos web Symfony)
 FROM php:8.2-fpm
 
-# Instalamos las librerías del sistema necesarias
+# Instalamos librerías (añadimos curl para descargar el CLI)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     unzip \
@@ -10,14 +9,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Configuramos e instalamos extensiones de PHP (MySQL, Intl, Zip y GD para imágenes)
+# Extensiones de PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) pdo_mysql intl zip gd
 
-# Copiamos Composer desde la imagen oficial (indispensable para DAW)
+# Instalamos Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Establecemos el directorio de trabajo (coincidiendo con tu docker-compose)
+# Instalamos Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+
 WORKDIR /var/www/html
