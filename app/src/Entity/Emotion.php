@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EmotionRepository::class)]
 class Emotion
@@ -17,15 +18,28 @@ class Emotion
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'La emoción necesita un nombre.')]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\NotBlank]
+    #[Assert\Range(
+        min: 1,
+        max: 10,
+        notInRangeMessage: 'El valor debe estar entre {{ min }} y {{ max }}.'
+    )]
     private ?int $value = null;
 
     #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
+        message: 'El color debe ser un formato hexadecimal válido (ej: #FF5733).'
+    )]
     private ?string $color = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $icon = null;
 
     #[ORM\ManyToOne(inversedBy: 'emotions')]

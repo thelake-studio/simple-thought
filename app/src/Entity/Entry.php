@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EntryRepository::class)]
 class Entry
@@ -17,18 +18,29 @@ class Entry
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'El contenido de tu reflexión no puede estar vacío.')]
+    #[Assert\Length(min: 5, minMessage: 'Intenta desarrollar un poco más tu pensamiento.')]
     private ?string $content = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTime $date = null;
+    #[Assert\NotNull(message: 'La fecha es obligatoria.')]
+    #[Assert\Type(type: \DateTimeInterface::class, message: 'La fecha debe ser un objeto de fecha válido.')]
+    private ?\DateTimeInterface $date = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\NotBlank]
+    #[Assert\Range(
+        min: 1,
+        max: 10,
+        notInRangeMessage: 'El valor histórico del ánimo debe estar entre {{ min }} y {{ max }}.'
+    )]
     private ?int $moodValueSnapshot = null;
 
     #[ORM\ManyToOne(inversedBy: 'entries')]
