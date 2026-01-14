@@ -11,10 +11,18 @@
 <div class="example-wrapper">
     <h1>Hello {{ controller_name }}! ✅</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/MainController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/main/index.html.twig</code></li>
-    </ul>
+    <div class="p-5">
+        <h1 class="text-primary">Prueba de Componentes</h1>
+
+        <button class="btn btn-primary">
+            <i class="fa-solid fa-rocket"></i> ¡Bootstrap y Icons funcionando!
+        </button>
+
+        <div class="mt-4">
+            <i class="fa-solid fa-user fa-2x text-info"></i>
+            <i class="fa-solid fa-brain fa-2x text-warning"></i>
+            <i class="fa-solid fa-check-circle fa-2x text-success"></i>
+        </div>
+    </div>
 </div>
 {% endblock %}
