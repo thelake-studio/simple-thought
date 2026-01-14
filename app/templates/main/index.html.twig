@@ -1,28 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello MainController!{% endblock %}
+{% block title %}Inicio - Simple Thought{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
-
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    <div class="p-5">
-        <h1 class="text-primary">Prueba de Componentes</h1>
-
-        <button class="btn btn-primary">
-            <i class="fa-solid fa-rocket"></i> ¡Bootstrap y Icons funcionando!
-        </button>
-
-        <div class="mt-4">
-            <i class="fa-solid fa-user fa-2x text-info"></i>
-            <i class="fa-solid fa-brain fa-2x text-warning"></i>
-            <i class="fa-solid fa-check-circle fa-2x text-success"></i>
+    <div class="row">
+        <div class="col">
+            <h1 class="display-5 fw-bold">Bienvenido, {{ app.user.nickname }}</h1>
+            <p class="lead text-muted">Hoy es un buen día para registrar cómo te sientes.</p>
+            <hr class="my-4">
         </div>
     </div>
-</div>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 p-3">
+                <div class="card-body">
+                    <i class="fa-solid fa-plus fa-2x text-primary mb-3"></i>
+                    <h5 class="card-title">Nueva Entrada</h5>
+                    <p class="card-text text-muted">Registra tu estado de ánimo y actividades.</p>
+                    <a href="#" class="btn btn-primary btn-sm">Empezar</a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
