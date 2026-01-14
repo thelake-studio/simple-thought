@@ -34,6 +34,27 @@ class AppFixtures extends Fixture
         // Le decimos a Doctrine que "prepare" este objeto para guardarlo
         $manager->persist($user);
 
+        // 2. Crear un catálogo de Emociones para este usuario
+        $emocionesDatos = [
+            ['Alegría', 9, '#FFD700', 'fa-smile'],
+            ['Calma', 7, '#ADD8E6', 'fa-leaf'],
+            ['Cansancio', 4, '#808080', 'fa-battery-quarter'],
+            ['Tristeza', 2, '#4682B4', 'fa-frown'],
+        ];
+
+        foreach ($emocionesDatos as [$nombre, $valor, $color, $icono]) {
+            $emotion = new Emotion();
+            $emotion->setName($nombre);
+            $emotion->setValue($valor); // Este valor (1-10) es para tus futuras gráficas
+            $emotion->setColor($color);
+            $emotion->setIcon($icono);
+
+            // ¡IMPORTANTE!: Vinculamos la emoción al usuario que creamos arriba
+            $emotion->setUser($user); //
+
+            $manager->persist($emotion);
+        }
+
         // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
     }
