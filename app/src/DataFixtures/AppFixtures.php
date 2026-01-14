@@ -76,6 +76,25 @@ class AppFixtures extends Fixture
             $manager->persist($activity);
         }
 
+        // 4. Crear un catálogo de Etiquetas (Tags) para este usuario
+        $tagsDatos = [
+            ['Importante', '#FF0000'],
+            ['Reflexión', '#4B0082'],
+            ['Logro', '#32CD32'],
+            ['Idea', '#FFFF00'],
+        ];
+
+        foreach ($tagsDatos as [$nombre, $color]) {
+            $tag = new Tag();
+            $tag->setName($nombre);
+            $tag->setColor($color);
+
+            // Cada etiqueta pertenece a tu usuario
+            $tag->setUser($user);
+
+            $manager->persist($tag);
+        }
+
         // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
     }
