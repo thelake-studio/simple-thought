@@ -6,6 +6,7 @@ use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
 class Tag
@@ -16,9 +17,15 @@ class Tag
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'El nombre de la etiqueta es obligatorio.')]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
+        message: 'El color del tag debe ser un formato hexadecimal válido.'
+    )]
     private ?string $color = null;
 
     #[ORM\ManyToOne(inversedBy: 'tags')]
