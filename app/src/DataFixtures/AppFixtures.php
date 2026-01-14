@@ -55,6 +55,27 @@ class AppFixtures extends Fixture
             $manager->persist($emotion);
         }
 
+        // 3. Crear un catálogo de Actividades para este usuario
+        $actividadesDatos = [
+            ['Deporte', 'Salud', 'fa-running', '#FF4500'],
+            ['Programar', 'Estudios', 'fa-code', '#1E90FF'],
+            ['Lectura', 'Ocio', 'fa-book', '#8A2BE2'],
+            ['Meditar', 'Salud', 'fa-spa', '#20B2AA'],
+        ];
+
+        foreach ($actividadesDatos as [$nombre, $categoria, $icono, $color]) {
+            $activity = new Activity();
+            $activity->setName($nombre);
+            $activity->setCategory($categoria);
+            $activity->setIcon($icono);
+            $activity->setColor($color);
+
+            // Vinculamos la actividad al usuario
+            $activity->setUser($user);
+
+            $manager->persist($activity);
+        }
+
         // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
     }
