@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
@@ -17,18 +18,27 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'La actividad debe tener un nombre.')]
+    #[Assert\Length(max: 255)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $category = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(max: 255)]
     private ?string $icon = null;
 
     #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Regex(
+        pattern: '/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
+        message: 'El color debe ser un formato hexadecimal válido.'
+    )]
     private ?string $color = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(max: 1000, maxMessage: 'La descripción es demasiado larga.')]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
