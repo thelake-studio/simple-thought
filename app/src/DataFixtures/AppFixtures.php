@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Emotion;
 use App\Entity\Activity;
 use App\Entity\Tag;
+use App\Entity\Entry;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -94,6 +95,27 @@ class AppFixtures extends Fixture
 
             $manager->persist($tag);
         }
+
+        // 5. Crear una Entrada de diario de prueba relacionada con todo lo anterior
+        $entrada = new Entry();
+        $entrada->setTitle('Mi primer día programando Simple Thought');
+        $entrada->setContent('Hoy he avanzado muchísimo en el TFG. He configurado las validaciones y las fixtures.');
+        $entrada->setDate(new \DateTime()); // Fecha de hoy
+
+        // El snapshot debe coincidir con el valor de la emoción en ese momento
+        $entrada->setMoodValueSnapshot($emotion->getValue());
+
+        // Relaciones ManyToOne: Un objeto para cada campo
+        $entrada->setUser($user);
+        $entrada->setEmotion($emotion); // Usará la última emoción del bucle anterior (Tristeza)
+
+        // Relaciones ManyToMany: Podemos añadir varias
+        $entrada->addActivity($activity); // Añade la última actividad (Meditar)
+        $entrada->addTag($tag); // Añade el último tag (Idea)
+
+        $entrada->setCreatedAt(new \DateTimeImmutable());
+
+        $manager->persist($entrada);
 
         // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
