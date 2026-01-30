@@ -72,6 +72,19 @@ final class EmotionController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_emotion_show', methods: ['GET'])]
+    public function show(Emotion $emotion): Response
+    {
+        // 1. Seguridad: Solo el dueño puede ver el detalle
+        if ($emotion->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No puedes ver una emoción que no es tuya.');
+        }
+
+        return $this->render('emotion/show.html.twig', [
+            'emotion' => $emotion,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_emotion_delete', methods: ['POST'])]
     public function delete(Request $request, \App\Entity\Emotion $emotion, EmotionRepository $emotionRepository): Response
     {
