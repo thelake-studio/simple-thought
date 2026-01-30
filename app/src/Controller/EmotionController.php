@@ -45,6 +45,33 @@ final class EmotionController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_emotion_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Emotion $emotion, EmotionRepository $emotionRepository): Response
+    {
+        // 1. Seguridad: Verificar que la emoción pertenece al usuario
+        if ($emotion->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No puedes editar una emoción que no es tuya.');
+        }
+
+        // 2. Crear el formulario con los datos existentes ($emotion)
+        $form = $this->createForm(EmotionType::class, $emotion);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // 3. Guardar cambios (Repository Pattern)
+            $emotionRepository->save($emotion, true);
+
+            $this->addFlash('success', 'Emoción actualizada correctamente.');
+
+            return $this->redirectToRoute('app_emotion_index');
+        }
+
+        return $this->render('emotion/edit.html.twig', [
+            'emotion' => $emotion,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_emotion_delete', methods: ['POST'])]
     public function delete(Request $request, \App\Entity\Emotion $emotion, EmotionRepository $emotionRepository): Response
     {
