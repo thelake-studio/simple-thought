@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Emotion;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,5 +33,15 @@ class EmotionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAllByUser(User $user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('e.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
