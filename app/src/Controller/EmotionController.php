@@ -44,4 +44,20 @@ final class EmotionController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}', name: 'app_emotion_delete', methods: ['POST'])]
+    public function delete(Request $request, \App\Entity\Emotion $emotion, EmotionRepository $emotionRepository): Response
+    {
+        // Seguridad: Verificar propiedad
+        if ($emotion->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$emotion->getId(), $request->request->get('_token'))) {
+            $emotionRepository->remove($emotion, true);
+            $this->addFlash('success', 'Emoción eliminada.');
+        }
+
+        return $this->redirectToRoute('app_emotion_index');
+    }
 }
