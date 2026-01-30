@@ -1,17 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        <title>{% block title %}Simple Thought{% endblock %}</title>
+
         {% block stylesheets %}
+            {{ importmap('app') }}
         {% endblock %}
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            {{ importmap('app') }}
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div class="d-flex">
+            <nav class="sidebar bg-dark text-white vh-100 position-fixed" style="width: 260px;">
+                <div class="p-4">
+                    <h3 class="h4 mb-4">🧠 Simple Thought</h3>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a href="{{ path('app_home') }}" class="nav-link text-white active">
+                                <i class="fa-solid fa-house me-2"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link text-white-50">
+                                <i class="fa-solid fa-calendar-day me-2"></i> Mi Diario
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="position-absolute bottom-0 w-100 p-4 border-top border-secondary">
+                    {% if app.user %}
+                        <div class="mb-2 small">{{ app.user.nickname }}</div>
+                        <a href="{{ path('app_logout') }}" class="btn btn-sm btn-outline-danger w-100">Salir</a>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <main class="ms-auto p-5" style="width: calc(100% - 260px);">
+                <div class="container-fluid">
+                    {% block body %}{% endblock %}
+                </div>
+            </main>
+        </div>
     </body>
 </html>
