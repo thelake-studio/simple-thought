@@ -1,20 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello EmotionController!{% endblock %}
+{% block title %}Mis Emociones{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 text-primary"><i class="fas fa-heart-pulse"></i> Mis Emociones</h1>
+        <a href="{{ path('app_emotion_new') }}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus"></i> Nueva Emoción
+        </a>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello! ✅</h1>
+    {% if emotions is empty %}
+        <div class="alert alert-info text-center shadow-sm">
+            <i class="fas fa-info-circle fa-2x mb-3 d-block"></i>
+            <p class="mb-0">Aún no has registrado ninguna emoción.</p>
+            <p>¡Empieza definiendo cómo te sientes habitualmente!</p>
+            <a href="{{ path('app_emotion_new') }}" class="btn btn-sm btn-outline-info mt-2">Crear mi primera emoción</a>
+        </div>
+    {% else %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for emotion in emotions %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 hover-effect">
+                        {# Cabecera con el color de la emoción #}
+                        <div class="card-header border-0 d-flex justify-content-between align-items-center text-white"
+                             style="background-color: {{ emotion.color|default('#6c757d') }};">
+                            <h5 class="card-title mb-0">
+                                {% if emotion.icon %}
+                                    <i class="{{ emotion.icon }}"></i>
+                                {% endif %}
+                                {{ emotion.name }}
+                            </h5>
+                            <span class="badge bg-light text-dark rounded-pill" title="Intensidad">
+                                {{ emotion.value }}/10
+                            </span>
+                        </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/EmotionController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/emotion/index.html.twig</code></li>
-    </ul>
+                        <div class="card-body">
+                            <p class="card-text text-muted small">
+                                Identificador visual y configuración para tus registros diarios.
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0 text-end">
+                            <a href="{{ path('app_emotion_show', {'id': emotion.id}) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 </div>
+
+<style>
+    /* Un pequeño toque extra de CSS para esta vista */
+    .hover-effect { transition: transform 0.2s; }
+    .hover-effect:hover { transform: translateY(-5px); }
+</style>
 {% endblock %}
