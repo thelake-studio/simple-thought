@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Emoción: {{ emotion.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 overflow-hidden">
+                {# Cabecera con el color de la emoción #}
+                <div class="card-header text-white p-4" style="background-color: {{ emotion.color }};">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h2 mb-0 fw-bold">
+                            {% if emotion.icon %}
+                                <i class="{{ emotion.icon }} me-2"></i>
+                            {% endif %}
+                            {{ emotion.name }}
+                        </h1>
+                        <span class="badge bg-white text-dark fs-5 shadow-sm">
+                            Valor: {{ emotion.value }}/10
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <h5 class="text-muted mb-3">Detalles de la Emoción</h5>
+
+                    <dl class="row">
+                        <dt class="col-sm-4 text-muted">ID Interno</dt>
+                        <dd class="col-sm-8">{{ emotion.id }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Nombre</dt>
+                        <dd class="col-sm-8 fw-bold">{{ emotion.name }}</dd>
+
+                        <dt class="col-sm-4 text-muted">Icono CSS</dt>
+                        <dd class="col-sm-8">
+                            {% if emotion.icon %}
+                                <code>{{ emotion.icon }}</code>
+                            {% else %}
+                                <span class="text-muted fst-italic">Sin icono</span>
+                            {% endif %}
+                        </dd>
+
+                        <dt class="col-sm-4 text-muted">Código de Color</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge border text-dark" style="background-color: {{ emotion.color }};">
+                                {{ emotion.color }}
+                            </span>
+                        </dd>
+                    </dl>
+
+                    {# Zona de estadísticas futuras (Placeholder) #}
+                    <div class="alert alert-light border mt-4">
+                        <i class="fas fa-chart-line text-primary"></i>
+                        <small class="text-muted">Aquí mostraremos cuántas veces has sentido esta emoción en el futuro módulo de estadísticas.</small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+                    <a href="{{ path('app_emotion_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al listado
+                    </a>
+
+                    <div>
+                        <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        {# Aquí usamos el partial de borrado #}
+                        {{ include('emotion/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
