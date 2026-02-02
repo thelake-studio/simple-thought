@@ -69,6 +69,18 @@ final class ActivityController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_activity_show', methods: ['GET'])]
+    public function show(Activity $activity): Response
+    {
+        if ($activity->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No puedes ver una actividad que no es tuya.');
+        }
+
+        return $this->render('activity/show.html.twig', [
+            'activity' => $activity,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_activity_delete', methods: ['POST'])]
     public function delete(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
     {
