@@ -3,10 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Activity;
-use App\Entity\Entry;
-use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,19 +15,30 @@ class ActivityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('category')
-            ->add('icon')
-            ->add('color')
-            ->add('description')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
+            ->add('name', TextType::class, [
+                'label' => 'Nombre de la Actividad',
+                'attr' => ['placeholder' => 'Ej: Correr, Leer, Estudiar Symfony...']
             ])
-            ->add('entries', EntityType::class, [
-                'class' => Entry::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+            ->add('category', TextType::class, [
+                'label' => 'Categoría',
+                'required' => false,
+                'attr' => ['placeholder' => 'Ej: Deporte, Ocio, Trabajo']
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Descripción (Opcional)',
+                'required' => false,
+                'attr' => [
+                    'rows' => 3,
+                    'placeholder' => 'Breve descripción de lo que implica esta actividad...'
+                ]
+            ])
+            ->add('color', ColorType::class, [
+                'label' => 'Color identificativo',
+            ])
+            ->add('icon', TextType::class, [
+                'label' => 'Icono (FontAwesome)',
+                'required' => false,
+                'attr' => ['placeholder' => 'fa-running']
             ])
         ;
     }
