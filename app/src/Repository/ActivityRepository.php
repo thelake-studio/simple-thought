@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Activity;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,7 @@ class ActivityRepository extends ServiceEntityRepository
     public function save(Activity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
+
         if ($flush) {
             $this->getEntityManager()->flush();
         }
@@ -27,12 +29,13 @@ class ActivityRepository extends ServiceEntityRepository
     public function remove(Activity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
+
         if ($flush) {
             $this->getEntityManager()->flush();
         }
     }
 
-    public function findAllByUser($user): array
+    public function findAllByUser(User $user): array
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.user = :val')
