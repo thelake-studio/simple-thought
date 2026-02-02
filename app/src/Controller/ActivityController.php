@@ -34,7 +34,7 @@ final class ActivityController extends AbstractController
             $activity->setUser($this->getUser());
             $activityRepository->save($activity, true);
 
-            $this->addFlash('success', 'Nueva emoción añadida.');
+            $this->addFlash('success', 'Nueva actividad añadida.');
 
             return $this->redirectToRoute('app_activity_index');
         }
@@ -43,5 +43,21 @@ final class ActivityController extends AbstractController
             'activity' => $activity,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}', name: 'app_activity_delete', methods: ['POST'])]
+    public function delete(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
+    {
+        // Seguridad: Verificar propiedad
+        if ($activity->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$activity->getId(), $request->request->get('_token'))) {
+            $activityRepository->remove($activity, true);
+            $this->addFlash('success', 'Actividad eliminada.');
+        }
+
+        return $this->redirectToRoute('app_activity_index');
     }
 }
