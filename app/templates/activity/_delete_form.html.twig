@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_activity_delete', {'id': activity.id}) }}" onsubmit="return confirm('¿Borrar esta actividad? Se perderán todos los registros diarios asociados a ella.');" class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ activity.id) }}">
+    <button class="btn btn-outline-danger">
+        <i class="fas fa-trash-alt"></i> Borrar
+    </button>
+</form>
