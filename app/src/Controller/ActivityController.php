@@ -45,6 +45,30 @@ final class ActivityController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_activity_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
+    {
+        if ($activity->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No puedes editar una actividad que no es tuya.');
+        }
+
+        $form = $this->createForm(ActivityType::class, $activity);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $activityRepository->save($activity, true);
+
+            $this->addFlash('success', 'Actividad actualizada correctamente.');
+
+            return $this->redirectToRoute('app_activity_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('activity/edit.html.twig', [
+            'activity' => $activity,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_activity_delete', methods: ['POST'])]
     public function delete(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
     {
