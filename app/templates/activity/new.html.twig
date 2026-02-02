@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Actividad{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="h3 mb-4 text-success"><i class="fas fa-plus-circle"></i> Registrar Actividad</h1>
+            
+            {% include 'activity/_form.html.twig' with {'button_label': 'Crear Actividad'} %}
+        </div>
+    </div>
+</div>
+{% endblock %}
