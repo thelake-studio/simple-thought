@@ -44,4 +44,20 @@ final class TagController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}', name: 'app_tag_delete', methods: ['POST'])]
+    public function delete(Request $request, Tag $tag, TagRepository $tagRepository): Response
+    {
+        // Seguridad: Verificar propiedad
+        if ($tag->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$tag->getId(), $request->request->get('_token'))) {
+            $tagRepository->remove($tag, true);
+            $this->addFlash('success', 'Etiqueta eliminada.');
+        }
+
+        return $this->redirectToRoute('app_tag_index');
+    }
 }
