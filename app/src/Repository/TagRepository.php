@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Tag;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,5 +33,15 @@ class TagRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAllByUser(User $user): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.user = :val')
+            ->setParameter('val', $user)
+            ->orderBy('t.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
