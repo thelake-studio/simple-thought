@@ -2,11 +2,10 @@
 
 namespace App\Form;
 
-use App\Entity\Entry;
 use App\Entity\Tag;
-use App\Entity\User;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,16 +14,13 @@ class TagType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
-            ->add('color')
-            ->add('user', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'id',
+            ->add('name', TextType::class, [
+                'label' => 'Nombre de la Etiqueta',
+                'attr' => ['placeholder' => 'Ej: Urgente, Importante, Reflexión...']
             ])
-            ->add('entries', EntityType::class, [
-                'class' => Entry::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+            ->add('color', ColorType::class, [
+                'label' => 'Color visual',
+                'attr' => ['title' => 'Elige un color para esta etiqueta']
             ])
         ;
     }
