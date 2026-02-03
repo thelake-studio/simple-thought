@@ -69,6 +69,18 @@ final class TagController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_tag_show', methods: ['GET'])]
+    public function show(Tag $tag): Response
+    {
+        if ($tag->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No tienes permiso para ver esta etiqueta.');
+        }
+
+        return $this->render('tag/show.html.twig', [
+            'tag' => $tag,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_tag_delete', methods: ['POST'])]
     public function delete(Request $request, Tag $tag, TagRepository $tagRepository): Response
     {
