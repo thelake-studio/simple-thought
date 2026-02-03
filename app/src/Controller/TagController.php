@@ -45,6 +45,30 @@ final class TagController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_tag_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Tag $tag, TagRepository $tagRepository): Response
+    {
+        if ($tag->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException('No puedes editar una etiqueta que no es tuya.');
+        }
+
+        $form = $this->createForm(TagType::class, $tag);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $tagRepository->save($tag, true);
+
+            $this->addFlash('success', 'Etiqueta actualizada correctamente.');
+
+            return $this->redirectToRoute('app_tag_index');
+        }
+
+        return $this->render('tag/edit.html.twig', [
+            'tag' => $tag,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_tag_delete', methods: ['POST'])]
     public function delete(Request $request, Tag $tag, TagRepository $tagRepository): Response
     {
