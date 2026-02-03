@@ -60,7 +60,7 @@ final class ActivityController extends AbstractController
 
             $this->addFlash('success', 'Actividad actualizada correctamente.');
 
-            return $this->redirectToRoute('app_activity_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_activity_index');
         }
 
         return $this->render('activity/edit.html.twig', [

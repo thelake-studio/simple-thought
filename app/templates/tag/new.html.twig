@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Etiqueta{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="h3 mb-4 text-primary"><i class="fas fa-plus-circle"></i> Registrar Etiqueta</h1>
+
+            {% include 'tag/_form.html.twig' with {'button_label': 'Crear Etiqueta'} %}
+        </div>
+    </div>
+</div>
+{% endblock %}

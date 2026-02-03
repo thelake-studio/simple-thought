@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Etiqueta{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="h3 mb-4 text-primary"><i class="fas fa-edit"></i> Editar: {{ tag.name }}</h1>
+
+            {% include 'tag/_form.html.twig' with {'button_label': 'Actualizar Etiqueta'} %}
+
+            <div class="mt-3 text-end">
+                {# Comentado temporalmente hasta que creemos el botón de borrado #}
+                {{ include('tag/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
