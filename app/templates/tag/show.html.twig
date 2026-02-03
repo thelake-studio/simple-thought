@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Etiqueta: {{ tag.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 overflow-hidden">
+                <div class="card-header bg-white p-4 border-bottom">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1 class="h2 mb-0 fw-bold d-flex align-items-center">
+                            <span class="rounded-circle d-inline-block me-3 shadow-sm" style="width: 25px; height: 25px; background-color: {{ tag.color|default('#6c757d') }};"></span>
+                            {{ tag.name }}
+                        </h1>
+                        <span class="badge bg-light text-dark border">
+                            {{ tag.color }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <h5 class="text-muted mb-3">Información de la Etiqueta</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 text-muted">ID Interno</dt>
+                        <dd class="col-sm-9">{{ tag.id }}</dd>
+
+                        <dt class="col-sm-3 text-muted">Color asignado</dt>
+                        <dd class="col-sm-9">
+                            <span class="badge" style="background-color: {{ tag.color }}; border: 1px solid rgba(0,0,0,0.1);">{{ tag.color }}</span>
+                        </dd>
+                    </dl>
+
+                    {# Zona de estadísticas futuras #}
+                    <div class="alert alert-light border mt-4">
+                        <i class="fas fa-link text-primary"></i>
+                        <small class="text-muted">Próximamente verás aquí cuántos pensamientos (Entries) usan esta etiqueta.</small>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
+                    <a href="{{ path('app_tag_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al listado
+                    </a>
+
+                    <div>
+                        <a href="{{ path('app_tag_edit', {'id': tag.id}) }}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        {# Incrustamos el botón de borrado aquí también #}
+                        {{ include('tag/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
