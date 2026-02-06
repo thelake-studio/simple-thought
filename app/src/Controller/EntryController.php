@@ -69,6 +69,18 @@ final class EntryController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'app_entry_show', methods: ['GET'])]
+    public function show(Entry $entry): Response
+    {
+        if ($entry->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        return $this->render('entry/show.html.twig', [
+            'entry' => $entry,
+        ]);
+    }
+
     #[Route('/{id}/edit', name: 'app_entry_edit', methods: ['GET', 'POST'])]
     public function edit(
         Request $request,
