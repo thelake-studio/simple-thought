@@ -69,6 +69,48 @@ final class EntryController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_entry_edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Request $request,
+        Entry $entry,
+        EntryRepository $entryRepository,
+        EmotionRepository $emotionRepository,
+        ActivityRepository $activityRepository,
+        TagRepository $tagRepository
+    ): Response
+    {
+        if ($entry->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $user = $this->getUser();
+
+        $form = $this->createForm(EntryType::class, $entry, [
+            'emotions' => $emotionRepository->findAllByUser($user),
+            'activities' => $activityRepository->findAllByUser($user),
+            'tags' => $tagRepository->findAllByUser($user),
+        ]);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($entry->getEmotion()) {
+                $entry->setMoodValueSnapshot($entry->getEmotion()->getValue());
+            }
+
+            $entryRepository->save($entry, true);
+
+            $this->addFlash('success', 'Entrada actualizada.');
+
+            return $this->redirectToRoute('app_entry_index');
+        }
+
+        return $this->render('entry/edit.html.twig', [
+            'entry' => $entry,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_entry_delete', methods: ['POST'])]
     public function delete(Request $request, Entry $entry, EntryRepository $entryRepository): Response
     {
