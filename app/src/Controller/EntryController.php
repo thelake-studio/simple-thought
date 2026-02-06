@@ -68,4 +68,19 @@ final class EntryController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}', name: 'app_entry_delete', methods: ['POST'])]
+    public function delete(Request $request, Entry $entry, EntryRepository $entryRepository): Response
+    {
+        if ($entry->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$entry->getId(), $request->request->get('_token'))) {
+            $entryRepository->remove($entry, true);
+            $this->addFlash('success', 'Entrada eliminada.');
+        }
+
+        return $this->redirectToRoute('app_entry_index');
+    }
 }
