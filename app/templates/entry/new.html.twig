@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Entrada{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width: 50px; height: 50px;">
+                    <i class="fas fa-pen-fancy fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 fw-bold text-primary">Querido Diario...</h1>
+                    <p class="text-muted small mb-0">Registra tus pensamientos y emociones de hoy.</p>
+                </div>
+            </div>
+
+            {% include 'entry/_form.html.twig' with {'button_label': 'Guardar Entrada'} %}
+        </div>
+    </div>
+</div>
+{% endblock %}

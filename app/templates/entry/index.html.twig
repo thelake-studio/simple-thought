@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mi Diario{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-primary fw-bold"><i class="fas fa-book-open"></i> Mi Diario</h1>
+            <p class="text-muted small mb-0">Tu historia, día a día.</p>
+        </div>
+        <a href="{{ path('app_entry_new') }}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-pen"></i> Escribir hoy
+        </a>
+    </div>
+
+    {% if entries is empty %}
+        <div class="text-center py-5">
+            <div class="mb-3 text-muted opacity-50">
+                <i class="fas fa-feather-alt fa-4x"></i>
+            </div>
+            <h4 class="fw-bold text-secondary">Tu diario está esperando...</h4>
+            <p class="text-muted">Aún no has registrado ningún pensamiento. ¡Hoy es un buen día para empezar!</p>
+            <a href="{{ path('app_entry_new') }}" class="btn btn-outline-primary mt-2">Crear mi primera entrada</a>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                {% for entry in entries %}
+                    <div class="card shadow-sm border-0 mb-4 hover-shadow transition-all">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-1">
+                                        {{ entry.date|date('l, d F Y') }}
+                                    </h6>
+                                    <h3 class="h4 fw-bold mb-0 text-dark">
+                                        {% if entry.title %}
+                                            {{ entry.title }}
+                                        {% else %}
+                                            <span class="fst-italic text-muted fw-normal">Sin título...</span>
+                                        {% endif %}
+                                    </h3>
+                                </div>
+
+                                {# --- CORRECCIÓN AQUÍ: Usamos FontAwesome --- #}
+                                {% if entry.emotion %}
+                                    <div class="text-center ms-3">
+                                        {# Usamos el icono guardado en la BBDD #}
+                                        <i class="{{ entry.emotion.icon }} fa-3x" style="color: {{ entry.emotion.color }};"></i>
+                                        <div class="small fw-bold text-uppercase mt-1" style="color: {{ entry.emotion.color }}; font-size: 0.7rem;">
+                                            {{ entry.emotion.name }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {# ------------------------------------------- #}
+                            </div>
+
+                            <p class="card-text text-secondary mb-3">
+                                {{ entry.content|striptags|slice(0, 150) ~ '...' }}
+                            </p>
+
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                {# Actividades con iconos #}
+                                {% for activity in entry.activities %}
+                                    <span class="badge bg-light text-dark border" title="{{ activity.name }}">
+                                        <i class="{{ activity.icon }}"></i> {{ activity.name }}
+                                    </span>
+                                {% endfor %}
+
+                                {# Tags #}
+                                {% for tag in entry.tags %}
+                                    <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                        {{ tag.name }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="text-end border-top pt-3">
+                                <a href="{{ path('app_entry_show', {'id': entry.id}) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    Leer completo <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .hover-shadow:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+    .transition-all { transition: all 0.3s ease; }
+</style>
+{% endblock %}
