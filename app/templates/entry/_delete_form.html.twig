@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_entry_delete', {'id': entry.id}) }}" onsubmit="return confirm('¿Estás seguro? Esta acción no se puede deshacer.');" class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ entry.id) }}">
+    <button class="btn btn-outline-danger btn-sm">
+        <i class="fas fa-trash-alt"></i> Eliminar Entrada
+    </button>
+</form>
