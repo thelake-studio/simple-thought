@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ entry.date|date('Y-m-d') }}{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0 overflow-hidden">
+
+                {# Cabecera de Color según la emoción #}
+                <div class="card-header p-4 text-white text-center position-relative" style="background-color: {{ entry.emotion ? entry.emotion.color : '#6c757d' }};">
+                    <a href="{{ path('app_entry_index') }}" class="btn btn-light btn-sm position-absolute top-0 start-0 m-3 rounded-circle shadow-sm" style="width: 35px; height: 35px; line-height: 25px;">
+                        <i class="fas fa-arrow-left text-dark"></i>
+                    </a>
+
+                    {# --- CORRECCIÓN AQUÍ: Icono FontAwesome Gigante --- #}
+                    <div class="mb-2">
+                        <i class="{{ entry.emotion ? entry.emotion.icon : 'fas fa-meh' }} fa-6x"></i>
+                    </div>
+                    {# -------------------------------------------------- #}
+
+                    <h2 class="h4 fw-bold text-uppercase mb-0">{{ entry.emotion ? entry.emotion.name : 'Neutro' }}</h2>
+                    <p class="mb-0 opacity-75">{{ entry.date|date('l, d F Y') }}</p>
+                </div>
+
+                <div class="card-body p-5 bg-white">
+                    {% if entry.title %}
+                        <h1 class="h2 fw-bold text-dark mb-4 text-center">{{ entry.title }}</h1>
+                    {% endif %}
+
+                    <div class="lead text-secondary mb-5" style="line-height: 1.8; white-space: pre-line;">
+                        {{ entry.content }}
+                    </div>
+
+                    <hr class="my-5 opacity-25">
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-running me-1"></i> Actividades</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for activity in entry.activities %}
+                                    <div class="d-flex align-items-center border rounded py-1 px-3">
+                                        {# Icono de actividad #}
+                                        <i class="{{ activity.icon }} text-primary me-2"></i>
+                                        <span>{{ activity.name }}</span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted fst-italic small">Ninguna registrada</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-tags me-1"></i> Etiquetas</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tag in entry.tags %}
+                                    <span class="badge rounded-pill" style="background-color: {{ tag.color }}; color: #fff;">{{ tag.name }}</span>
+                                {% else %}
+                                    <span class="text-muted fst-italic small">Sin etiquetas</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded text-center small text-muted">
+                        <i class="fas fa-chart-line me-1"></i> Intensidad registrada: <strong>{{ entry.moodValueSnapshot }}/10</strong>
+                    </div>
+
+                </div>
+
+                <div class="card-footer bg-light p-4 d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">Creado el {{ entry.createdAt|date('d/m/Y H:i') }}</span>
+
+                    <div>
+                        <a href="{{ path('app_entry_edit', {'id': entry.id}) }}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        {{ include('entry/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
