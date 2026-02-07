@@ -35,7 +35,7 @@ class Entry
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Assert\NotBlank]
+    //#[Assert\NotBlank]
     #[Assert\Range(
         min: 1,
         max: 10,
