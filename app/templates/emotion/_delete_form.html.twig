@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_emotion_delete', {'id': emotion.id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta emoción? Esta acción no se puede deshacer.');" class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ emotion.id) }}">
+    <button class="btn btn-outline-danger">
+        <i class="fas fa-trash-alt"></i> Borrar
+    </button>
+</form>

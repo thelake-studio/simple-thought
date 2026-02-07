@@ -11,7 +11,9 @@
         "bmewburn.vscode-intelephense-client",
         "sensiolabs.symfony-vscode-extension",
         "miku86.twig-beautifier",
-        "xdebug.php-debug"
+        "xdebug.php-debug",
+        "mblode.twig-language-2",
+        "esbenp.prettier-vscode"
       ]
     }
   },

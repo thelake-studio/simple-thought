@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_tag_delete', {'id': tag.id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar esta etiqueta? Se eliminará la asociación con todas tus entradas.');" class="d-inline-block">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tag.id) }}">
+    <button class="btn btn-outline-danger">
+        <i class="fas fa-trash-alt"></i> Borrar
+    </button>
+</form>

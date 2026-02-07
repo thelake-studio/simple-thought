@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Etiquetas{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 text-primary"><i class="fas fa-tags"></i> Mis Etiquetas</h1>
+            <p class="text-muted small mb-0">Organiza tus pensamientos en diferentes categorías.</p>
+        </div>
+        <a href="{{ path('app_tag_new') }}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus"></i> Nueva Etiqueta
+        </a>
+    </div>
+
+    {% if tags is empty %}
+        <div class="alert alert-light border text-center shadow-sm py-5">
+            <div class="text-primary mb-3">
+                <i class="fas fa-tag fa-3x"></i>
+            </div>
+            <h4 class="alert-heading">Sin etiquetas</h4>
+            <p class="text-muted">Aún no has creado ninguna etiqueta para organizar tu diario.</p>
+            <a href="{{ path('app_tag_new') }}" class="btn btn-outline-primary mt-3">Crear mi primera etiqueta</a>
+        </div>
+    {% else %}
+        {# Usamos una rejilla más densa (4 columnas en escritorio) porque las etiquetas ocupan poco #}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for tag in tags %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 hover-effect">
+                        <div class="card-body d-flex align-items-center p-3">
+                            {# Círculo de color #}
+                            <span class="rounded-circle d-inline-block me-3 shadow-sm" style="width: 20px; height: 20px; background-color: {{ tag.color|default('#6c757d') }};"></span>
+
+                            {# Nombre de la etiqueta #}
+                            <h6 class="card-title mb-0 fw-bold text-truncate flex-grow-1">
+                                {{ tag.name }}
+                            </h6>
+                        </div>
+
+                        {# Botones de acción minimalistas #}
+                        <div class="card-footer bg-white border-top-0 pt-0 pb-3 text-end">
+                            <a href="{{ path('app_tag_show', {'id': tag.id}) }}" class="btn btn-sm btn-outline-secondary" title="Ver detalle">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ path('app_tag_edit', {'id': tag.id}) }}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .hover-effect { transition: transform 0.2s, box-shadow 0.2s; }
+    .hover-effect:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important; }
+</style>
+{% endblock %}
