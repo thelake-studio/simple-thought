@@ -3,24 +3,93 @@
 {% block title %}Inicio - Simple Thought{% endblock %}
 
 {% block body %}
-    <div class="row">
-        <div class="col">
-            <h1 class="display-5 fw-bold">Bienvenido, {{ app.user.nickname }}</h1>
-            <p class="lead text-muted">Hoy es un buen día para registrar cómo te sientes.</p>
-            <hr class="my-4">
+<div class="container py-4">
+    {# Cabecera de Bienvenida #}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold text-dark">Hola, {{ app.user.nickname }} 👋</h1>
+            <p class="lead text-muted">Aquí tienes el control de tu bienestar emocional.</p>
+            <hr class="my-4 opacity-25">
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 p-3">
-                <div class="card-body">
-                    <i class="fa-solid fa-plus fa-2x text-primary mb-3"></i>
-                    <h5 class="card-title">Nueva Entrada</h5>
-                    <p class="card-text text-muted">Registra tu estado de ánimo y actividades.</p>
-                    <a href="#" class="btn btn-primary btn-sm">Empezar</a>
+    {# SECCIÓN 1: ACCIONES PRINCIPALES (Diario) #}
+    <h5 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-book-open me-2"></i> Mi Diario</h5>
+    <div class="row g-4 mb-5">
+        {# Tarjeta: Nueva Entrada #}
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100 hover-card">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary">
+                        <i class="fas fa-pen-fancy fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title fw-bold mb-1">Escribir Entrada de Hoy</h5>
+                        <p class="card-text text-muted small mb-2">Registra cómo te sientes y qué has hecho.</p>
+                        <a href="{{ path('app_entry_new') }}" class="btn btn-sm btn-primary stretched-link">Empezar ahora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta: Ver Historial #}
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 h-100 hover-card">
+                <div class="card-body p-4 d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3 text-success">
+                        <i class="fas fa-history fa-2x"></i>
+                    </div>
+                    <div>
+                        <h5 class="card-title fw-bold mb-1">Ver mi Historial</h5>
+                        <p class="card-text text-muted small mb-2">Revisa tus entradas anteriores y reflexiona.</p>
+                        <a href="{{ path('app_entry_index') }}" class="btn btn-sm btn-outline-success stretched-link">Abrir Timeline</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    {# SECCIÓN 2: GESTIÓN (Catálogos) #}
+    <h5 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-cogs me-2"></i> Configuración Personal</h5>
+    <div class="row g-4 row-cols-1 row-cols-md-3">
+
+        {# Emociones #}
+        <div class="col">
+            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
+                <div class="card-body">
+                    <i class="fas fa-smile-beam fa-3x text-warning mb-3"></i>
+                    <h6 class="card-title fw-bold">Emociones</h6>
+                    <a href="{{ path('app_emotion_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
+                </div>
+            </div>
+        </div>
+
+        {# Actividades #}
+        <div class="col">
+            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
+                <div class="card-body">
+                    <i class="fas fa-running fa-3x text-info mb-3"></i>
+                    <h6 class="card-title fw-bold">Actividades</h6>
+                    <a href="{{ path('app_activity_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
+                </div>
+            </div>
+        </div>
+
+        {# Etiquetas #}
+        <div class="col">
+            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
+                <div class="card-body">
+                    <i class="fas fa-tags fa-3x text-secondary mb-3"></i>
+                    <h6 class="card-title fw-bold">Etiquetas</h6>
+                    <a href="{{ path('app_tag_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card { transition: transform 0.2s; }
+    .hover-card:hover { transform: translateY(-5px); }
+</style>
 {% endblock %}
