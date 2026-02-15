@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\GoalLogRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GoalLogRepository::class)]
 class GoalLog
@@ -14,13 +15,18 @@ class GoalLog
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'La fecha es obligatoria.')]
+    #[Assert\LessThanOrEqual('today', message: 'No puedes registrar progreso en una fecha futura.')]
     private ?\DateTimeImmutable $date = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: 'Debes indicar un valor de progreso.')]
+    #[Assert\Positive(message: 'El valor del progreso debe ser un número positivo.')]
     private ?int $value = null;
 
     #[ORM\ManyToOne(inversedBy: 'goalLogs')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: 'El registro debe estar vinculado a un objetivo.')]
     private ?Goal $goal = null;
 
     public function getId(): ?int
