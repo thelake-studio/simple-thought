@@ -33,4 +33,15 @@ class GoalLogRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function findByUser($user): array
+    {
+        return $this->createQueryBuilder('gl')
+            ->join('gl.goal', 'g')
+            ->andWhere('g.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('gl.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
