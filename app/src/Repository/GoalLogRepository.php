@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\GoalLog;
+use App\Entity\Goal;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -43,5 +44,22 @@ class GoalLogRepository extends ServiceEntityRepository
             ->orderBy('gl.date', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function getSumBetweenDates(Goal $goal, \DateTimeInterface $start, \DateTimeInterface $end): int
+    {
+        $result = $this->createQueryBuilder('gl')
+            ->select('SUM(gl.value)')
+            ->andWhere('gl.goal = :goal')
+            ->andWhere('gl.date >= :start')
+            ->andWhere('gl.date <= :end')
+            ->setParameter('goal', $goal)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        // Si no hay resultados, devuelve null, así que lo forzamos a 0
+        return (int) $result;
     }
 }
