@@ -6,6 +6,7 @@ use App\Repository\GoalRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GoalRepository::class)]
 class Goal
@@ -16,22 +17,29 @@ class Goal
     public const PERIOD_DAILY = 'DAILY';
     public const PERIOD_WEEKLY = 'WEEKLY';
     public const PERIOD_MONTHLY = 'MONTHLY';
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'El nombre del objetivo no puede estar vacío.')]
+    #[Assert\Length(min: 3, max: 255, minMessage: 'El nombre es demasiado corto.')]
     private ?string $name = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: [Goal::TYPE_STREAK, Goal::TYPE_SUM], message: 'Tipo de objetivo no válido.')]
     private ?string $type = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank]
+    #[Assert\Choice(choices: [Goal::PERIOD_DAILY, Goal::PERIOD_WEEKLY, Goal::PERIOD_MONTHLY], message: 'Periodo no válido.')]
     private ?string $period = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\GreaterThan(0, message: 'El valor objetivo debe ser mayor que cero.')]
     private ?int $targetValue = null;
 
     #[ORM\Column]
