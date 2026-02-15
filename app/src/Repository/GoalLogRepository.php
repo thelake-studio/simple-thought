@@ -62,4 +62,14 @@ class GoalLogRepository extends ServiceEntityRepository
         // Si no hay resultados, devuelve null, así que lo forzamos a 0
         return (int) $result;
     }
+
+    public function findLogsForGoal(Goal $goal): array
+    {
+        return $this->createQueryBuilder('gl')
+            ->andWhere('gl.goal = :goal')
+            ->setParameter('goal', $goal)
+            ->orderBy('gl.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
