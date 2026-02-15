@@ -10,6 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: GoalRepository::class)]
 class Goal
 {
+    public const TYPE_STREAK = 'STREAK';
+    public const TYPE_SUM = 'SUM';
+
+    public const PERIOD_DAILY = 'DAILY';
+    public const PERIOD_WEEKLY = 'WEEKLY';
+    public const PERIOD_MONTHLY = 'MONTHLY';
+    
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
