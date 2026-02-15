@@ -33,4 +33,14 @@ class GoalRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function findByUser($user): array
+    {
+        return $this->createQueryBuilder('g')
+            ->andWhere('g.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('g.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
