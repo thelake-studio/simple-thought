@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\GoalRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GoalRepository::class)]
@@ -31,6 +33,17 @@ class Goal
     #[ORM\ManyToOne(inversedBy: 'goals')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    /**
+     * @var Collection<int, GoalLog>
+     */
+    #[ORM\OneToMany(targetEntity: GoalLog::class, mappedBy: 'goal', orphanRemoval: true)]
+    private Collection $goalLogs;
+
+    public function __construct()
+    {
+        $this->goalLogs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,6 +118,36 @@ class Goal
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GoalLog>
+     */
+    public function getGoalLogs(): Collection
+    {
+        return $this->goalLogs;
+    }
+
+    public function addGoalLog(GoalLog $goalLog): static
+    {
+        if (!$this->goalLogs->contains($goalLog)) {
+            $this->goalLogs->add($goalLog);
+            $goalLog->setGoal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGoalLog(GoalLog $goalLog): static
+    {
+        if ($this->goalLogs->removeElement($goalLog)) {
+            // set the owning side to null (unless already changed)
+            if ($goalLog->getGoal() === $this) {
+                $goalLog->setGoal(null);
+            }
+        }
 
         return $this;
     }
