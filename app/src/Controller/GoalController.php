@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Goal;
+use App\Entity\GoalLog;
 use App\Form\GoalType;
 use App\Repository\GoalRepository;
+use App\Repository\GoalLogRepository;
 use App\Service\GoalService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,6 +89,29 @@ final class GoalController extends AbstractController
         return $this->render('goal/edit.html.twig', [
             'goal' => $goal,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_goal_show', methods: ['GET'])]
+    public function show(Goal $goal, GoalService $goalService, GoalLogRepository $logRepository): Response
+    {
+        // Seguridad
+        if ($goal->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($goal->getType() === Goal::TYPE_SUM) {
+            $stats = $goalService->getProgress($goal);
+        } else {
+            $stats = $goalService->getStreak($goal);
+        }
+
+        $history = $logRepository->findLogsForGoal($goal);
+
+        return $this->render('goal/show.html.twig', [
+            'goal' => $goal,
+            'stats' => $stats,
+            'history' => $history,
         ]);
     }
 
