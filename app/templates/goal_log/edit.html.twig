@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Corregir Registro{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('app_goal_show', {'id': goal_log.goal.id}) }}" class="btn btn-link text-decoration-none text-muted ps-0">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+                <h1 class="h4 mb-0 ms-2">✏️ Corregir Historial</h1>
+            </div>
+
+            {# Tarjeta de Edición #}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-pencil-fill me-2"></i> Estás editando un registro de:
+                        <strong>{{ goal_log.goal.name }}</strong>
+                    </div>
+
+                    {# Pasamos el goal explícitamente desde el objeto goal_log para que el partial sepa qué texto mostrar #}
+                    {{ include('goal_log/_form.html.twig', {
+                        'button_label': 'Actualizar Registro',
+                        'goal': goal_log.goal
+                    }) }}
+                </div>
+            </div>
+
+            {# Zona de Borrado #}
+            <div class="card border-danger">
+                <div class="card-body d-flex justify-content-between align-items-center p-3">
+                    <span class="text-danger small">¿Fue un error? Bórralo aquí.</span>
+                    <div style="min-width: 150px;">
+                        {{ include('goal_log/_delete_form.html.twig', {'log_id': goal_log.id}) }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

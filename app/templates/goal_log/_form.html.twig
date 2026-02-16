@@ -1,0 +1,31 @@
+{{ form_start(form) }}
+
+    <div class="mb-3">
+        {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+        {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+        <div class="form-text">Si es un registro pasado, selecciona la fecha correcta.</div>
+        {{ form_errors(form.date) }}
+    </div>
+
+    <div class="mb-4">
+        {{ form_label(form.value, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+        {{ form_widget(form.value, {'attr': {'class': 'form-control form-control-lg'}}) }}
+
+        {# Lógica visual: Mensaje según el tipo de objetivo #}
+        {# Nota: Accedemos al goal directamente si está disponible en la vista #}
+        {% if goal is defined and goal.type == constant('App\\Entity\\Goal::TYPE_STREAK') %}
+            <div class="form-text text-success">
+                <i class="bi bi-info-circle"></i> Para hábitos de racha, el valor suele ser <strong>1</strong>.
+            </div>
+        {% else %}
+            <div class="form-text">Introduce la cantidad exacta a sumar (ej: pasos, páginas).</div>
+        {% endif %}
+
+        {{ form_errors(form.value) }}
+    </div>
+
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary btn-lg">{{ button_label|default('Guardar Registro') }}</button>
+    </div>
+
+{{ form_end(form) }}

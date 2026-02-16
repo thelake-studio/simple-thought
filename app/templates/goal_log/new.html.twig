@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registrar Progreso{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="d-flex align-items-center mb-4">
+                <a href="{{ path('app_goal_show', {'id': goal.id}) }}" class="btn btn-link text-decoration-none text-muted ps-0">
+                    <i class="bi bi-arrow-left"></i> Volver al objetivo
+                </a>
+                <h1 class="h4 mb-0 ms-2">📝 Registrar Progreso Manual</h1>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light py-3">
+                    <h5 class="card-title mb-0 text-muted">
+                        Para: <strong class="text-dark">{{ goal.name }}</strong>
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {# Incluimos el formulario y pasamos la variable goal #}
+                    {{ include('goal_log/_form.html.twig', {
+                        'button_label': 'Guardar Registro',
+                        'goal': goal
+                    }) }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

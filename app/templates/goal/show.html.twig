@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ goal.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    {# --- CABECERA Y NAVEGACIÓN --- #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{{ path('app_goal_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+
+        <div class="btn-group">
+            <a href="{{ path('app_goal_log_new', {'id': goal.id}) }}" class="btn btn-success">
+                <i class="bi bi-calendar-plus"></i> Añadir registro manual
+            </a>
+            <a href="{{ path('app_goal_edit', {'id': goal.id}) }}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Editar Objetivo
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        {# --- COLUMNA IZQUIERDA: RESUMEN / ESTADÍSTICAS --- #}
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center p-4">
+                    <h2 class="h4 text-muted mb-3">{{ goal.name }}</h2>
+
+                    <hr class="my-4">
+
+                    {% if goal.type == constant('App\\Entity\\Goal::TYPE_SUM') %}
+                        {# VISTA PARA SUMATORIOS #}
+                        <div class="display-1 fw-bold text-primary mb-0">{{ stats.percentage }}%</div>
+                        <p class="text-muted mb-4">Completado {{ stats.period_label|default('en total') }}</p>
+
+                        <div class="progress mb-3" style="height: 20px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ stats.percentage }}%"></div>
+                        </div>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>{{ stats.current }}</span>
+                            <span>{{ stats.target }}</span>
+                        </div>
+
+                    {% else %}
+                        {# VISTA PARA RACHAS #}
+                        <div class="mb-3">
+                            <i class="bi bi-fire text-warning" style="font-size: 5rem;"></i>
+                        </div>
+                        <div class="display-4 fw-bold">{{ stats.current_streak }}</div>
+                        <p class="text-muted text-uppercase small letter-spacing-1">Días de Racha</p>
+
+                        {% if stats.is_completed_today %}
+                            <div class="alert alert-success mt-4">
+                                <i class="bi bi-check-circle-fill"></i> ¡Hoy has cumplido!
+                            </div>
+                        {% else %}
+                            <div class="alert alert-light border mt-4">
+                                <i class="bi bi-clock"></i> Pendiente hoy
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {# --- COLUMNA DERECHA: HISTORIAL DE LOGS --- #}
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Historial de Progreso</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Fecha</th>
+                                    <th>Valor Registrado</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for log in history %}
+                                <tr>
+                                    <td class="ps-4">
+                                        {# Formato de fecha legible #}
+                                        <span class="fw-bold">{{ log.date|date('d/m/Y') }}</span>
+                                        <small class="text-muted d-block">{{ log.date|date('l') }}</small>
+                                    </td>
+                                    <td>
+                                        {% if goal.type == constant('App\\Entity\\Goal::TYPE_SUM') %}
+                                            <span class="badge bg-primary rounded-pill">+ {{ log.value }}</span>
+                                        {% else %}
+                                            <span class="badge bg-success rounded-pill">
+                                                <i class="bi bi-check-lg"></i> Hecho
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            {# Botón Editar #}
+                                            <a href="{{ path('app_goal_log_edit', {'id': log.id}) }}" class="btn btn-sm btn-outline-secondary" title="Editar registro">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            {# Botón Borrar (Formulario pequeño) #}
+                                            <form method="post" action="{{ path('app_goal_log_delete', {'id': log.id}) }}" onsubmit="return confirm('¿Borrar este registro?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ log.id) }}">
+                                                <button class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        No hay registros en el historial todavía.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
