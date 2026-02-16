@@ -44,4 +44,31 @@ final class GoalLogController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/log/{id}/edit', name: 'app_goal_log_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, GoalLog $goalLog, GoalLogRepository $goalLogRepository): Response
+    {
+        // Seguridad: Verificar a través del objetivo padre
+        if ($goalLog->getGoal()->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(GoalLogType::class, $goalLog);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $goalLogRepository->save($goalLog, true);
+
+            $this->addFlash('success', 'Registro corregido.');
+
+            // Redirigimos al objetivo padre
+            return $this->redirectToRoute('app_goal_show', ['id' => $goalLog->getGoal()->getId()]);
+        }
+
+        return $this->render('goal_log/edit.html.twig', [
+            'goal_log' => $goalLog,
+            'form' => $form,
+        ]);
+    }
+
 }
