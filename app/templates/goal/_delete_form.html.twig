@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_goal_delete', {'id': goal.id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este objetivo? Perderás todo el historial de progreso.');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ goal.id) }}">
+    <button class="btn btn-outline-danger w-100">
+        <i class="bi bi-trash"></i> Eliminar Objetivo
+    </button>
+</form>

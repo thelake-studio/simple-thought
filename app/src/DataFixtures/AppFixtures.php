@@ -7,6 +7,8 @@ use App\Entity\Emotion;
 use App\Entity\Activity;
 use App\Entity\Tag;
 use App\Entity\Entry;
+use App\Entity\Goal;
+use App\Entity\GoalLog;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -116,6 +118,69 @@ class AppFixtures extends Fixture
         $entrada->setCreatedAt(new \DateTimeImmutable());
 
         $manager->persist($entrada);
+
+        // --- ESCENARIO 1: RACHA ACTIVA (Leer 30 min) ---
+        // Tipo: Racha | Periodo: Diario | Estado: Llevamos 5 días seguidos
+        $goalReading = new Goal();
+        $goalReading->setName('Leer 30 minutos');
+        $goalReading->setType(Goal::TYPE_STREAK);
+        $goalReading->setPeriod(Goal::PERIOD_DAILY);
+        $goalReading->setTargetValue(1); // 1 vez al día
+        $goalReading->setUser($user);
+        $goalReading->setCreatedAt(new \DateTimeImmutable());
+        $manager->persist($goalReading);
+
+        // Generamos logs para los últimos 5 días (incluido hoy)
+        for ($i = 0; $i < 5; $i++) {
+            $log = new GoalLog();
+            $log->setGoal($goalReading);
+            $log->setDate(new \DateTimeImmutable("- $i days"));
+            $log->setValue(1); // Cumplido
+            $manager->persist($log);
+        }
+
+        // --- ESCENARIO 2: RACHA ROTA (Sin Azúcar) ---
+        // Tipo: Racha | Periodo: Diario | Estado: Fallaste ayer (sin log ayer)
+        $goalSugar = new Goal();
+        $goalSugar->setName('Días sin azúcar');
+        $goalSugar->setType(Goal::TYPE_STREAK);
+        $goalSugar->setPeriod(Goal::PERIOD_DAILY);
+        $goalSugar->setUser($user);
+        $goalSugar->setCreatedAt(new \DateTimeImmutable());
+        $manager->persist($goalSugar);
+
+        // Generamos logs antiguos (hace 3, 4 y 5 días), pero NO ayer ni hoy
+        for ($i = 3; $i <= 6; $i++) {
+            $log = new GoalLog();
+            $log->setGoal($goalSugar);
+            $log->setDate(new \DateTimeImmutable("- $i days"));
+            $log->setValue(1);
+            $manager->persist($log);
+        }
+
+        // --- ESCENARIO 3: SUMA SEMANAL (Pasos) ---
+        // Tipo: Suma | Periodo: Semanal | Meta: 20.000 | Estado: Llevamos ~12.000
+        $goalSteps = new Goal();
+        $goalSteps->setName('Caminar 20k pasos');
+        $goalSteps->setType(Goal::TYPE_SUM);
+        $goalSteps->setPeriod(Goal::PERIOD_WEEKLY);
+        $goalSteps->setTargetValue(20000);
+        $goalSteps->setUser($user);
+        $goalSteps->setCreatedAt(new \DateTimeImmutable());
+        $manager->persist($goalSteps);
+
+        // Simulamos unos pasos esta semana
+        $logSteps1 = new GoalLog();
+        $logSteps1->setGoal($goalSteps);
+        $logSteps1->setDate(new \DateTimeImmutable('today'));
+        $logSteps1->setValue(5000);
+        $manager->persist($logSteps1);
+
+        $logSteps2 = new GoalLog();
+        $logSteps2->setGoal($goalSteps);
+        $logSteps2->setDate(new \DateTimeImmutable('-1 day')); // Ayer
+        $logSteps2->setValue(7500);
+        $manager->persist($logSteps2);
 
         // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
