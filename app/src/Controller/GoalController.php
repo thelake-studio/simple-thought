@@ -65,4 +65,19 @@ final class GoalController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}', name: 'app_goal_delete', methods: ['POST'])]
+    public function delete(Request $request, Goal $goal, GoalRepository $goalRepository): Response
+    {
+        if ($goal->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$goal->getId(), $request->request->get('_token'))) {
+            $goalRepository->remove($goal, true);
+            $this->addFlash('success', 'Objetivo eliminado.');
+        }
+
+        return $this->redirectToRoute('app_goal_index');
+    }
 }
