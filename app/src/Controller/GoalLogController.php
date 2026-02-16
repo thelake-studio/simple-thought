@@ -71,4 +71,22 @@ final class GoalLogController extends AbstractController
         ]);
     }
 
+    #[Route('/log/{id}', name: 'app_goal_log_delete', methods: ['POST'])]
+    public function delete(Request $request, GoalLog $goalLog, GoalLogRepository $goalLogRepository): Response
+    {
+        // Seguridad
+        if ($goalLog->getGoal()->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // Guardamos el ID del padre antes de borrar el hijo para poder redirigir
+        $goalId = $goalLog->getGoal()->getId();
+
+        if ($this->isCsrfTokenValid('delete'.$goalLog->getId(), $request->request->get('_token'))) {
+            $goalLogRepository->remove($goalLog, true);
+            $this->addFlash('success', 'Registro eliminado del historial.');
+        }
+
+        return $this->redirectToRoute('app_goal_show', ['id' => $goalId]);
+    }
 }
