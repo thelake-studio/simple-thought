@@ -68,6 +68,38 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/log', name: 'app_goal_log', methods: ['POST'])]
+    public function log(Request $request, Goal $goal, GoalLogRepository $logRepository): Response
+    {
+        // 1. Seguridad: Verificar propiedad
+        if ($goal->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        // 2. Comprobación de Token CSRF (Seguridad extra para formularios)
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('log-goal'.$goal->getId(), $token)) {
+             $this->addFlash('error', 'Token de seguridad inválido. Inténtalo de nuevo.');
+             return $this->redirectToRoute('app_goal_index');
+        }
+
+        // 3. Recuperar el valor.
+        $value = $request->request->get('value');
+        $amount = is_numeric($value) ? (int)$value : 1;
+
+        // 4. Crear el registro
+        $log = new GoalLog();
+        $log->setGoal($goal);
+        $log->setDate(new \DateTimeImmutable('today'));
+        $log->setValue($amount);
+
+        $logRepository->save($log, true);
+
+        $this->addFlash('success', '¡Progreso registrado! Sigue así.');
+
+        return $this->redirectToRoute('app_goal_index');
+    }
+
     #[Route('/{id}/edit', name: 'app_goal_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Goal $goal, GoalRepository $goalRepository): Response
     {
