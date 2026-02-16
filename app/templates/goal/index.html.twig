@@ -1,20 +1,144 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello GoalController!{% endblock %}
+{% block title %}Mis Objetivos{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-4">
+    {# Cabecera #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">🎯 Mis Objetivos</h1>
+            <p class="text-muted small mb-0">Gestiona tus metas y registra tu progreso diario.</p>
+        </div>
+        <a href="{{ path('app_goal_new') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nuevo Objetivo
+        </a>
+    </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {# Grid de Tarjetas #}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/GoalController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/goal/index.html.twig</code></li>
-    </ul>
+        {% for item in goals_data %}
+            {# Extraemos variables para que sea más fácil leer el código #}
+            {% set goal = item.entity %}
+            {% set stats = item.stats %}
+
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+
+                    {# Cabecera de la Tarjeta: Nombre y Menú #}
+                    <div class="card-header bg-white d-flex justify-content-between align-items-start pt-3 pb-0 border-0">
+                        <h5 class="card-title text-truncate mb-0">
+                            <a href="{{ path('app_goal_show', {'id': goal.id}) }}" class="text-decoration-none text-dark stretched-link">
+                                {{ goal.name }}
+                            </a>
+                        </h5>
+                        <div class="z-index-front"> {# Clase para que el botón funcione encima del stretched-link #}
+                            <a href="{{ path('app_goal_edit', {'id': goal.id}) }}" class="text-muted btn btn-sm btn-link p-0">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+
+                        {# --- LÓGICA VISUAL SEGÚN TIPO --- #}
+
+                        {% if goal.type == constant('App\\Entity\\Goal::TYPE_SUM') %}
+                            {# === DISEÑO PARA OBJETIVOS ACUMULATIVOS (SUM) === #}
+                            <div class="d-flex justify-content-between align-items-end mb-2">
+                                <span class="display-6 fw-bold text-primary">{{ stats.percentage }}%</span>
+                                <small class="text-muted">{{ stats.current }} / {{ stats.target }}</small>
+                            </div>
+
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar {% if stats.percentage >= 100 %}bg-success{% else %}bg-primary{% endif %}"
+                                     role="progressbar"
+                                     style="width: {{ stats.percentage }}%"
+                                     aria-valuenow="{{ stats.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                            <p class="text-muted small mt-2 mb-0">
+                                <i class="bi bi-calendar-week"></i> Periodo {{ goal.period == 'WEEKLY' ? 'Semanal' : (goal.period == 'MONTHLY' ? 'Mensual' : 'Diario') }}
+                            </p>
+
+                        {% else %}
+                            {# === DISEÑO PARA OBJETIVOS DE RACHA (STREAK) === #}
+                            <div class="text-center py-2">
+                                <div class="mb-1">
+                                    <i class="bi bi-fire fs-1 {% if stats.current_streak > 0 %}text-warning{% else %}text-muted{% endif %}"></i>
+                                </div>
+                                <h3 class="fw-bold mb-0">
+                                    {{ stats.current_streak }} <small class="text-muted fs-6 font-weight-normal">días seguidos</small>
+                                </h3>
+
+                                {% if stats.is_completed_today %}
+                                    <span class="badge bg-success mt-2">
+                                        <i class="bi bi-check-circle"></i> Completado hoy
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border mt-2">
+                                        Pendiente hoy
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                    {# Pie de Tarjeta: ACCIÓN RÁPIDA #}
+                    <div class="card-footer bg-white border-0 pt-0 pb-3 z-index-front" style="position: relative; z-index: 2;">
+                        <hr class="my-2 text-muted opacity-25">
+
+                        <form method="post" action="{{ path('app_goal_log', {'id': goal.id}) }}" class="d-flex gap-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('log-goal' ~ goal.id) }}">
+
+                            {% if goal.type == constant('App\\Entity\\Goal::TYPE_SUM') %}
+                                {# Input para sumar cantidad #}
+                                <input type="number" name="value" class="form-control form-control-sm" placeholder="Cant." min="1" required>
+                                <button class="btn btn-sm btn-outline-primary" type="submit">
+                                    <i class="bi bi-plus-lg"></i> Sumar
+                                </button>
+                            {% else %}
+                                {# Botón simple para racha #}
+                                {% if not stats.is_completed_today %}
+                                    <button class="btn btn-sm btn-outline-warning w-100 fw-bold" type="submit">
+                                        <i class="bi bi-check2-circle"></i> ¡Marcar hecho hoy!
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-light w-100 text-muted" disabled>
+                                        ¡Ya has cumplido hoy!
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        {% else %}
+            {# ESTADO VACÍO (Empty State) #}
+            <div class="col-12 text-center py-5">
+                <div class="text-muted mb-3">
+                    <i class="bi bi-clipboard-data" style="font-size: 4rem;"></i>
+                </div>
+                <h3>Aún no tienes objetivos</h3>
+                <p class="text-muted">Define qué quieres lograr y empieza a medir tu progreso.</p>
+                <a href="{{ path('app_goal_new') }}" class="btn btn-primary mt-2">
+                    Crear mi primer objetivo
+                </a>
+            </div>
+        {% endfor %}
+
+    </div>
 </div>
+
+{# Pequeño truco CSS para que el enlace principal no tape los botones de acción #}
+<style>
+    .z-index-front {
+        position: relative;
+        z-index: 2; /* Mayor que el stretched-link de bootstrap */
+    }
+</style>
 {% endblock %}
