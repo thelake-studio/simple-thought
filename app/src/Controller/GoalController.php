@@ -66,6 +66,30 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/edit', name: 'app_goal_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Goal $goal, GoalRepository $goalRepository): Response
+    {
+        if ($goal->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $form = $this->createForm(GoalType::class, $goal);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $goalRepository->save($goal, true);
+
+            $this->addFlash('success', 'Objetivo actualizado.');
+
+            return $this->redirectToRoute('app_goal_index');
+        }
+
+        return $this->render('goal/edit.html.twig', [
+            'goal' => $goal,
+            'form' => $form,
+        ]);
+    }
+
     #[Route('/{id}', name: 'app_goal_delete', methods: ['POST'])]
     public function delete(Request $request, Goal $goal, GoalRepository $goalRepository): Response
     {
