@@ -3,34 +3,36 @@
 > **Diario Emocional y Gestión de Bienestar Personal.**
 > *Trabajo de Fin de Grado (TFG) - Desarrollo de Aplicaciones Web.*
 
-![Estado](https://img.shields.io/badge/Estado-En_Desarrollo-yellow)
-![Versión](https://img.shields.io/badge/Versión-v0.1.0_Alpha-blue)
+![Estado](https://img.shields.io/badge/Estado-En_Desarrollo-green)
+![Versión](https://img.shields.io/badge/Versión-v0.2.0_Beta-blue)
 ![Stack](https://img.shields.io/badge/Symfony-6.4%2B-black)
 
 ## 📖 Descripción
-**Simple Thought** es una aplicación web diseñada para ayudar a los usuarios a registrar, entender y gestionar sus emociones diarias. A diferencia de un diario tradicional, permite categorizar cada entrada con emociones específicas, actividades realizadas y etiquetas personalizadas, sentando las bases para un futuro análisis estadístico del bienestar.
+**Simple Thought** es una aplicación web diseñada para ayudar a los usuarios a registrar, entender y gestionar su bienestar integral. El sistema combina un diario emocional profundo con un gestor de objetivos cuantificables, permitiendo al usuario no solo reflexionar sobre cómo se siente, sino también actuar sobre lo que quiere conseguir.
 
 ---
 
-## 🚀 Funcionalidades (v0.1.0)
+## 🚀 Funcionalidades (v0.2.0)
 
-Esta versión **Alpha** incluye el núcleo funcional del Diario ("The Core Diary Module"):
+Esta versión **Beta** introduce el módulo completo de Gestión de Objetivos, complementando al núcleo del Diario:
 
-### 1. Gestión de Catálogos Personales
-El usuario puede configurar su propio ecosistema de datos:
-* **Emociones**: Creación de emociones personalizadas con nombre, color y descripción.
-* **Actividades**: Registro de actividades (Deporte, Lectura, Trabajo...) con iconos representativos.
-* **Etiquetas**: Sistema de etiquetado flexible para contextos específicos.
+### 1. El Diario (Core Module)
+* **Registro Contextual**: Vinculación de emociones, actividades y etiquetas en cada entrada.
+* **Timeline Cronológico**: Vista histórica de pensamientos y estados de ánimo.
+* **Snapshot Emocional**: Integridad de datos históricos.
+* **Gestión de Catálogos**: Personalización total de emociones (colores/descripción), actividades y etiquetas.
 
-### 2. El Diario (Entries)
-* **Registro Diario**: Interfaz para crear entradas vinculando una emoción, múltiples actividades y etiquetas.
-* **Timeline**: Vista cronológica de todas las entradas con tarjetas visuales.
-* **Detalle**: Vista inmersiva de cada pensamiento.
-* **Snapshot Emocional**: El sistema guarda el valor de la emoción en el momento del registro para mantener la integridad histórica.
-
-### 3. Dashboard Principal
-* Acceso rápido a la creación de entradas.
-* Navegación intuitiva hacia los catálogos y el historial.
+### 2. Gestión de Objetivos (NUEVO v0.2.0)
+El sistema permite definir metas y realizar un seguimiento del progreso mediante dos lógicas de negocio diferenciadas:
+* **Objetivos de Racha (Streaks)**: Para la formación de hábitos diarios (ej: "Meditar", "No fumar").
+    * Contador visual de días consecutivos (Fuego 🔥).
+    * Detección automática de ruptura de rachas.
+* **Objetivos Acumulativos (Sum)**: Para metas cuantificables (ej: "Leer 30 min", "Caminar 10k pasos").
+    * Barras de progreso dinámicas.
+    * Periodos configurables: Diario, Semanal o Mensual.
+* **Dashboard Inteligente**:
+    * **Acciones Rápidas**: Botones de "Check" o "Sumar" directamente desde el listado.
+    * **Historial Detallado**: Tabla completa de registros con opciones de edición y borrado manual para corrección de datos.
 
 ---
 
@@ -45,12 +47,14 @@ El usuario puede configurar su propio ecosistema de datos:
 ## 🗺️ Hoja de Ruta (Roadmap)
 
 - [x] **Fase 1: El Diario (v0.1.0)** - *Completado*
-- [ ] **Fase 2: Gestión de Objetivos** - *Próximamente*
-    - Definición de metas personales.
-    - Seguimiento de progreso.
-- [ ] **Fase 3: Estadísticas y Dashboard Avanzado**
-    - Gráficas de estado de ánimo.
+- [x] **Fase 2: Gestión de Objetivos (v0.2.0)** - *Completado*
+    - Definición de metas (Rachas y Sumatorios).
+    - Lógica de cálculo de progreso (Service Layer).
+    - Dashboard interactivo y gestión de historial.
+- [ ] **Fase 3: Estadísticas y Dashboard Avanzado** - *En Desarrollo*
+    - Gráficas de estado de ánimo (Chart.js).
     - Correlación entre actividades y emociones.
+    - Visualización de consistencia en objetivos a largo plazo.
 
 ---
 
