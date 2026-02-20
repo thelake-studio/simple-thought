@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Estadísticas{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">📊 Análisis Personal</h1>
+        <p class="text-muted mb-0">Comprende tus emociones y hábitos</p>
+    </div>
+
+    <div class="row">
+        {# Tarjeta para nuestra primera gráfica #}
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Prueba de Conexión Chart.js</h5>
+                </div>
+                <div class="card-body">
+                    {# LA MAGIA ESTÁ AQUÍ: Solo con poner data-controller="chart", Stimulus entra en acción #}
+                    <canvas data-controller="chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
