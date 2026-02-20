@@ -2,27 +2,24 @@ import { Controller } from '@hotwired/stimulus';
 import Chart from 'chart.js/auto';
 
 export default class extends Controller {
-    connect() {
-        console.log('📈 Stimulus ha detectado el canvas. ¡Pintando gráfica!');
+    // 1. Definimos qué valores esperamos recibir desde Twig
+    static values = {
+        datos: Object
+    }
 
-        // "this.element" hace referencia al <canvas> donde hemos puesto el data-controller
+    connect() {
+        console.log('📊 Renderizando gráfica con datos desde PHP:', this.datosValue);
+
         new Chart(this.element, {
-            type: 'bar',
-            data: {
-                labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
-                datasets: [{
-                    label: 'Nivel de Energía (Prueba)',
-                    data: [6, 9, 3, 5, 8],
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
+            type: 'line',
+            data: this.datosValue,
             options: {
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: { stepSize: 1 }
                     }
                 }
             }

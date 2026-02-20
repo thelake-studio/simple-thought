@@ -10,15 +10,29 @@
     </div>
 
     <div class="row">
-        {# Tarjeta para nuestra primera gráfica #}
+        {# Tarjeta 1: Evolución Semanal #}
         <div class="col-md-8 mb-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">Prueba de Conexión Chart.js</h5>
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-chart-line text-primary me-2"></i> Evolución del Ánimo (Esta Semana)
+                    </h5>
                 </div>
                 <div class="card-body">
-                    {# LA MAGIA ESTÁ AQUÍ: Solo con poner data-controller="chart", Stimulus entra en acción #}
-                    <canvas data-controller="chart"></canvas>
+                    <canvas
+                        data-controller="chart"
+                        data-chart-datos-value="{{ moodChartData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Espacio para futuras tarjetas (Ej: Distribución de Emociones) #}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-0 h-100 bg-light d-flex align-items-center justify-content-center">
+                <div class="text-center text-muted">
+                    <i class="fa-solid fa-chart-pie fa-3x mb-3 text-secondary opacity-50"></i>
+                    <p class="mb-0">Próximamente:<br>Distribución Mensual</p>
                 </div>
             </div>
         </div>
