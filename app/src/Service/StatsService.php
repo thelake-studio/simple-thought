@@ -154,4 +154,55 @@ class StatsService
             ]
         ];
     }
+
+    /**
+     * Matriz Actividad-Emoción: Calcula la media de ánimo por cada actividad.
+     */
+    public function getActivityMoodMatrixData(User $user): array
+    {
+        $entries = $this->entryRepository->findAllByUser($user);
+        $activityMoods = [];
+
+        // 1. Recopilamos todos los valores de ánimo asociados a cada actividad
+        foreach ($entries as $entry) {
+            $moodValue = $entry->getMoodValueSnapshot();
+
+            // Solo contamos si la entrada tiene un estado de ánimo registrado
+            if ($moodValue !== null) {
+                foreach ($entry->getActivities() as $activity) {
+                    $name = $activity->getName();
+                    if (!isset($activityMoods[$name])) {
+                        $activityMoods[$name] = [];
+                    }
+                    $activityMoods[$name][] = $moodValue;
+                }
+            }
+        }
+
+        // 2. Calculamos la media matemática para cada actividad
+        $activityAverages = [];
+        foreach ($activityMoods as $name => $moods) {
+            $activityAverages[$name] = array_sum($moods) / count($moods);
+        }
+
+        // 3. Ordenamos de mayor a menor para ver qué nos hace más felices
+        arsort($activityAverages);
+
+        // Nos quedamos con el Top 7 para que la gráfica se vea limpia
+        $topActivities = array_slice($activityAverages, 0, 7, true);
+
+        // 4. Formato Chart.js
+        return [
+            'labels' => array_keys($topActivities),
+            'datasets' => [
+                [
+                    'label' => 'Media de Ánimo (Sobre 10)',
+                    'data' => array_values($topActivities),
+                    'backgroundColor' => 'rgba(153, 102, 255, 0.6)',
+                    'borderColor' => '#9966ff',
+                    'borderWidth' => 1
+                ]
+            ]
+        ];
+    }
 }

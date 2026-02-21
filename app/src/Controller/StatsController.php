@@ -21,6 +21,7 @@ final class StatsController extends AbstractController
             'moodChartData' => $statsService->getWeeklyMoodData($user),
             'monthlyChartData' => $statsService->getMonthlyMoodData($user),
             'topActivitiesData' => $statsService->getTopActivitiesData($user),
+            'activityMoodMatrixData' => $statsService->getActivityMoodMatrixData($user),
         ]);
     }
 }

@@ -61,6 +61,25 @@
                 </div>
             </div>
         </div>
+
+        {# Tarjeta 4: Matriz Actividad-Emoción (Barras) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-bolt text-info me-2"></i> Impacto en el Ánimo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {# Aquí le decimos que sea de tipo 'bar' (Barras) #}
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-datos-value="{{ activityMoodMatrixData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
