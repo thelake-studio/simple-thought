@@ -72,8 +72,61 @@ final class StatsController extends AbstractController
             ]
         ];
 
+        // --- INICIO CÁLCULO MENSUAL ---
+        // 1. Calculamos las fechas: Día 1 y Último día del mes actual
+        $firstDayOfMonth = new \DateTime('first day of this month');
+        $lastDayOfMonth = new \DateTime('last day of this month');
+
+        // 2. Obtenemos las entradas del mes
+        $monthlyEntries = $entryRepository->findEntriesBetweenDates($user, $firstDayOfMonth, $lastDayOfMonth);
+
+        // 3. Preparamos los datos base para el mes (del día 1 al 28, 30 o 31)
+        $daysInMonth = (int) $lastDayOfMonth->format('t');
+        $monthlyData = [];
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $monthlyData[$i] = [];
+        }
+
+        // 4. Rellenamos con los datos reales
+        foreach ($monthlyEntries as $entry) {
+            $dayOfMonth = (int) $entry->getDate()->format('j');
+            if ($entry->getMoodValueSnapshot() !== null) {
+                $monthlyData[$dayOfMonth][] = $entry->getMoodValueSnapshot();
+            }
+        }
+
+        // 5. Calculamos la media por día
+        $monthlyChartDataPoints = [];
+        $monthlyLabels = [];
+        foreach ($monthlyData as $day => $values) {
+            $monthlyLabels[] = $day;
+            if (count($values) > 0) {
+                $monthlyChartDataPoints[] = array_sum($values) / count($values);
+            } else {
+                $monthlyChartDataPoints[] = null;
+            }
+        }
+
+        // 6. Formato para Chart.js
+        $monthlyChartData = [
+            'labels' => $monthlyLabels,
+            'datasets' => [
+                [
+                    'label' => 'Nivel de Ánimo',
+                    'data' => $monthlyChartDataPoints,
+                    'borderColor' => '#198754', // Verde Bootstrap
+                    'backgroundColor' => 'rgba(25, 135, 84, 0.2)',
+                    'tension' => 0.4,
+                    'fill' => true,
+                    'spanGaps' => true
+                ]
+            ]
+        ];
+        // --- FIN CÁLCULO MENSUAL ---
+
         return $this->render('stats/index.html.twig', [
             'moodChartData' => $moodChartData,
+            'monthlyChartData' => $monthlyChartData,
         ]);
     }
 }
