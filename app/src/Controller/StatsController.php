@@ -20,6 +20,7 @@ final class StatsController extends AbstractController
         return $this->render('stats/index.html.twig', [
             'moodChartData' => $statsService->getWeeklyMoodData($user),
             'monthlyChartData' => $statsService->getMonthlyMoodData($user),
+            'topActivitiesData' => $statsService->getTopActivitiesData($user),
         ]);
     }
 }

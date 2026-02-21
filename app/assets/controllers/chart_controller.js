@@ -2,27 +2,32 @@ import { Controller } from '@hotwired/stimulus';
 import Chart from 'chart.js/auto';
 
 export default class extends Controller {
-    // 1. Definimos qué valores esperamos recibir desde Twig
     static values = {
-        datos: Object
+        datos: Object,
+        type: { type: String, default: 'line' }
     }
 
     connect() {
-        console.log('📊 Renderizando gráfica con datos desde PHP:', this.datosValue);
+        let chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+        };
+
+        // Solo añadimos los ejes (escalas) si es un gráfico de líneas o barras
+        if (this.typeValue === 'line' || this.typeValue === 'bar') {
+            chartOptions.scales = {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    ticks: { stepSize: 1 }
+                }
+            };
+        }
 
         new Chart(this.element, {
-            type: 'line',
+            type: this.typeValue,
             data: this.datosValue,
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 10,
-                        ticks: { stepSize: 1 }
-                    }
-                }
-            }
+            options: chartOptions
         });
     }
 }

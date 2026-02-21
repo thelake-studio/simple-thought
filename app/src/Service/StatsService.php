@@ -107,4 +107,51 @@ class StatsService
             ]
         ];
     }
+
+    /**
+     * Calcula el Top 5 de actividades más realizadas.
+     */
+    public function getTopActivitiesData(User $user): array
+    {
+        $entries = $this->entryRepository->findAllByUser($user);
+        $activityCounts = [];
+
+        // 1. Contamos las actividades de cada entrada
+        foreach ($entries as $entry) {
+            foreach ($entry->getActivities() as $activity) {
+                $name = $activity->getName();
+                if (!isset($activityCounts[$name])) {
+                    $activityCounts[$name] = 0;
+                }
+                $activityCounts[$name]++;
+            }
+        }
+
+        // 2. Ordenamos de mayor a menor y cogemos las 5 primeras
+        arsort($activityCounts);
+        $topActivities = array_slice($activityCounts, 0, 5, true);
+
+        // 3. Paleta de colores chula para el Donut
+        $backgroundColors = [
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+        ];
+
+        // 4. Formato Chart.js
+        return [
+            'labels' => array_keys($topActivities),
+            'datasets' => [
+                [
+                    'label' => 'Veces realizada',
+                    'data' => array_values($topActivities),
+                    'backgroundColor' => array_slice($backgroundColors, 0, count($topActivities)),
+                    'borderWidth' => 2,
+                    'borderColor' => '#ffffff'
+                ]
+            ]
+        ];
+    }
 }
