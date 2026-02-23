@@ -13,93 +13,53 @@ class StatsService
     }
 
     /**
-     * Calcula los datos de la gráfica de evolución semanal.
+     * Evolución del Ánimo Dinámica: Calcula la media de ánimo en un rango de fechas.
      */
-    public function getWeeklyMoodData(User $user): array
+    public function getMoodEvolutionData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $monday = new \DateTime('monday this week');
-        $sunday = new \DateTime('sunday this week');
-        $entries = $this->entryRepository->findEntriesBetweenDates($user, $monday, $sunday);
+        // 1. Buscamos las entradas en ese rango específico
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
-        $weeklyData = [
-            'Lunes' => [], 'Martes' => [], 'Miércoles' => [],
-            'Jueves' => [], 'Viernes' => [], 'Sábado' => [], 'Domingo' => []
-        ];
+        // 2. Generamos un array con todos los días del rango
+        $period = new \DatePeriod(
+            $startDate,
+            new \DateInterval('P1D'),
+            (clone $endDate)->modify('+1 day')
+        );
 
-        $diasSemana = [
-            'Monday' => 'Lunes', 'Tuesday' => 'Martes', 'Wednesday' => 'Miércoles',
-            'Thursday' => 'Jueves', 'Friday' => 'Viernes', 'Saturday' => 'Sábado', 'Sunday' => 'Domingo'
-        ];
+        $dailyData = [];
+        foreach ($period as $date) {
+            $dailyData[$date->format('d/m')] = [];
+        }
 
+        // 3. Rellenamos el array con las notas de ánimo de las entradas reales
         foreach ($entries as $entry) {
-            $dayNameEnglish = $entry->getDate()->format('l');
-            $dayNameSpanish = $diasSemana[$dayNameEnglish];
-
             if ($entry->getMoodValueSnapshot() !== null) {
-                $weeklyData[$dayNameSpanish][] = $entry->getMoodValueSnapshot();
+                $dateKey = $entry->getDate()->format('d/m');
+
+                if (isset($dailyData[$dateKey])) {
+                    $dailyData[$dateKey][] = $entry->getMoodValueSnapshot();
+                }
             }
         }
 
-        $chartDataPoints = [];
-        foreach ($weeklyData as $values) {
-            $chartDataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
-        }
-
-        return [
-            'labels' => array_keys($weeklyData),
-            'datasets' => [
-                [
-                    'label' => 'Nivel de Ánimo',
-                    'data' => $chartDataPoints,
-                    'borderColor' => '#0d6efd',
-                    'backgroundColor' => 'rgba(13, 110, 253, 0.2)',
-                    'tension' => 0.4,
-                    'fill' => true,
-                    'spanGaps' => true
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Calcula los datos de la gráfica de evolución mensual.
-     */
-    public function getMonthlyMoodData(User $user): array
-    {
-        $firstDayOfMonth = new \DateTime('first day of this month');
-        $lastDayOfMonth = new \DateTime('last day of this month');
-        $monthlyEntries = $this->entryRepository->findEntriesBetweenDates($user, $firstDayOfMonth, $lastDayOfMonth);
-
-        $daysInMonth = (int) $lastDayOfMonth->format('t');
-
-        // Inicializamos el array del mes (del 1 al 28/30/31)
-        $monthlyData = [];
-        for ($i = 1; $i <= $daysInMonth; $i++) {
-            $monthlyData[$i] = [];
-        }
-
-        foreach ($monthlyEntries as $entry) {
-            $dayOfMonth = (int) $entry->getDate()->format('j');
-            if ($entry->getMoodValueSnapshot() !== null) {
-                $monthlyData[$dayOfMonth][] = $entry->getMoodValueSnapshot();
-            }
-        }
-
-        $chartDataPoints = [];
+        // 4. Calculamos la media de cada día
         $labels = [];
-        foreach ($monthlyData as $day => $values) {
+        $dataPoints = [];
+        foreach ($dailyData as $day => $values) {
             $labels[] = $day;
-            $chartDataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
+            $dataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
         }
 
+        // 5. Devolvemos el formato de Chart.js
         return [
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Nivel de Ánimo',
-                    'data' => $chartDataPoints,
-                    'borderColor' => '#198754',
-                    'backgroundColor' => 'rgba(25, 135, 84, 0.2)',
+                    'label' => 'Evolución del Ánimo',
+                    'data' => $dataPoints,
+                    'borderColor' => '#0d6efd',
+                    'backgroundColor' => 'rgba(13, 110, 253, 0.2)',
                     'tension' => 0.4,
                     'fill' => true,
                     'spanGaps' => true

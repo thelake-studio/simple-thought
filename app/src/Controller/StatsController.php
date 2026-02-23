@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\StatsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -13,13 +14,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class StatsController extends AbstractController
 {
     #[Route('/', name: 'app_stats_index', methods: ['GET'])]
-    public function index(StatsService $statsService): Response
+    public function index(Request $request, StatsService $statsService): Response
     {
         $user = $this->getUser();
 
+        $startString = $request->query->get('start');
+        $endString = $request->query->get('end');
+
+        try {
+            $startDate = $startString ? new \DateTime($startString) : new \DateTime('-6 days');
+            $endDate = $endString ? new \DateTime($endString) : new \DateTime('today');
+        } catch (\Exception $e) {
+            $startDate = new \DateTime('-6 days');
+            $endDate = new \DateTime('today');
+        }
+
+        $startDate->setTime(0, 0, 0);
+        $endDate->setTime(23, 59, 59);
+
         return $this->render('stats/index.html.twig', [
-            'moodChartData' => $statsService->getWeeklyMoodData($user),
-            'monthlyChartData' => $statsService->getMonthlyMoodData($user),
+            'currentStart' => $startDate->format('Y-m-d'),
+            'currentEnd' => $endDate->format('Y-m-d'),
+            'moodEvolutionData' => $statsService->getMoodEvolutionData($user, $startDate, $endDate),
             'topActivitiesData' => $statsService->getTopActivitiesData($user),
             'activityMoodMatrixData' => $statsService->getActivityMoodMatrixData($user),
         ]);
