@@ -53,11 +53,12 @@
                             <i class="fa-solid fa-user-plus me-2"></i> Registrarme
                         </button>
 
-                        {# Enlace al Login #}
-                        <div class="text-center">
-                            <p class="text-muted small mb-0">
-                                ¿Ya tienes una cuenta? <a href="{{ path('app_login') }}" class="text-decoration-none fw-bold">Inicia sesión aquí</a>
-                            </p>
+                        {# Botón simétrico para ir al Login #}
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <p class="text-muted small mb-2">¿Ya formas parte de Simple Thought?</p>
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Iniciar sesión
+                            </a>
                         </div>
 
                     {{ form_end(registrationForm) }}
