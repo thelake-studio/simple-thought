@@ -1,20 +1,43 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfileController!{% endblock %}
+{% block title %}Mi Perfil - Simple Thought{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fa-solid fa-user text-primary me-2"></i> Mi Cuenta</h4>
+                    <a href="{{ path('app_profile_edit') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-pen"></i> Editar
+                    </a>
+                </div>
+                <div class="card-body p-4">
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item px-0">
+                            <span class="text-muted d-block small">¿Cómo te llamamos?</span>
+                            <span class="fs-5 fw-bold">{{ user.nickname }}</span>
+                        </li>
+                        <li class="list-group-item px-0">
+                            <span class="text-muted d-block small">Correo Electrónico</span>
+                            <span class="fs-5">{{ user.email }}</span>
+                        </li>
+                    </ul>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+                    <hr class="mb-4">
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/var/www/html/src/Controller/ProfileController.php</code></li>
-        <li>Your template at <code>/var/www/html/templates/profile/index.html.twig</code></li>
-    </ul>
+                    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded border border-danger border-opacity-25">
+                        <div>
+                            <h6 class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h6>
+                            <p class="text-muted small mb-0">Esta acción es irreversible y borrará todo tu diario.</p>
+                        </div>
+
+                        {{ include('profile/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
