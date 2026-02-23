@@ -4,7 +4,7 @@
 import './styles/app.css';
 
 // 2. Importamos el JS de Bootstrap
-import 'vendor/bootstrap/bootstrap.index.js';
+import 'bootstrap';
 
 // 3. Importamos Stimulus
 import './stimulus_bootstrap.js';
