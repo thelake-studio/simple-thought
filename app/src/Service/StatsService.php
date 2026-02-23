@@ -69,14 +69,15 @@ class StatsService
     }
 
     /**
-     * Calcula el Top 5 de actividades más realizadas.
+     * Top Actividades: Ahora dinámico por fechas
      */
-    public function getTopActivitiesData(User $user): array
+    public function getTopActivitiesData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $entries = $this->entryRepository->findAllByUser($user);
+        // 1. Usamos la misma consulta que creamos para la evolución
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+
         $activityCounts = [];
 
-        // 1. Contamos las actividades de cada entrada
         foreach ($entries as $entry) {
             foreach ($entry->getActivities() as $activity) {
                 $name = $activity->getName();
@@ -87,79 +88,60 @@ class StatsService
             }
         }
 
-        // 2. Ordenamos de mayor a menor y cogemos las 5 primeras
         arsort($activityCounts);
         $topActivities = array_slice($activityCounts, 0, 5, true);
 
-        // 3. Paleta de colores chula para el Donut
-        $backgroundColors = [
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-        ];
-
-        // 4. Formato Chart.js
         return [
             'labels' => array_keys($topActivities),
             'datasets' => [
                 [
-                    'label' => 'Veces realizada',
                     'data' => array_values($topActivities),
-                    'backgroundColor' => array_slice($backgroundColors, 0, count($topActivities)),
-                    'borderWidth' => 2,
-                    'borderColor' => '#ffffff'
+                    'backgroundColor' => ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db'],
+                    'borderWidth' => 0,
+                    'hoverOffset' => 4
                 ]
             ]
         ];
     }
 
     /**
-     * Matriz Actividad-Emoción: Calcula la media de ánimo por cada actividad.
+     * Matriz de Impacto: Ahora dinámica por fechas
      */
-    public function getActivityMoodMatrixData(User $user): array
+    public function getActivityMoodMatrixData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $entries = $this->entryRepository->findAllByUser($user);
+        // 1. Filtramos por fechas
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+
         $activityMoods = [];
 
-        // 1. Recopilamos todos los valores de ánimo asociados a cada actividad
         foreach ($entries as $entry) {
-            $moodValue = $entry->getMoodValueSnapshot();
-
-            // Solo contamos si la entrada tiene un estado de ánimo registrado
-            if ($moodValue !== null) {
+            if ($entry->getMoodValueSnapshot() !== null) {
                 foreach ($entry->getActivities() as $activity) {
                     $name = $activity->getName();
                     if (!isset($activityMoods[$name])) {
                         $activityMoods[$name] = [];
                     }
-                    $activityMoods[$name][] = $moodValue;
+                    $activityMoods[$name][] = $entry->getMoodValueSnapshot();
                 }
             }
         }
 
-        // 2. Calculamos la media matemática para cada actividad
-        $activityAverages = [];
+        $matrixData = [];
         foreach ($activityMoods as $name => $moods) {
-            $activityAverages[$name] = array_sum($moods) / count($moods);
+            $matrixData[$name] = count($moods) > 0 ? array_sum($moods) / count($moods) : 0;
         }
 
-        // 3. Ordenamos de mayor a menor para ver qué nos hace más felices
-        arsort($activityAverages);
+        arsort($matrixData);
+        $topMatrix = array_slice($matrixData, 0, 7, true);
 
-        // Nos quedamos con el Top 7 para que la gráfica se vea limpia
-        $topActivities = array_slice($activityAverages, 0, 7, true);
-
-        // 4. Formato Chart.js
         return [
-            'labels' => array_keys($topActivities),
+            'labels' => array_keys($topMatrix),
             'datasets' => [
                 [
-                    'label' => 'Media de Ánimo (Sobre 10)',
-                    'data' => array_values($topActivities),
-                    'backgroundColor' => 'rgba(153, 102, 255, 0.6)',
-                    'borderColor' => '#9966ff',
+                    'label' => 'Nota Media del Ánimo',
+                    'data' => array_values($topMatrix),
+                    'backgroundColor' => 'rgba(155, 89, 182, 0.7)',
+                    'borderColor' => '#8e44ad',
                     'borderWidth' => 1
                 ]
             ]

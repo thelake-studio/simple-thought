@@ -32,12 +32,13 @@ final class StatsController extends AbstractController
         $startDate->setTime(0, 0, 0);
         $endDate->setTime(23, 59, 59);
 
+        // 3. PASAR LOS DATOS A TWIG
         return $this->render('stats/index.html.twig', [
             'currentStart' => $startDate->format('Y-m-d'),
             'currentEnd' => $endDate->format('Y-m-d'),
             'moodEvolutionData' => $statsService->getMoodEvolutionData($user, $startDate, $endDate),
-            'topActivitiesData' => $statsService->getTopActivitiesData($user),
-            'activityMoodMatrixData' => $statsService->getActivityMoodMatrixData($user),
+            'topActivitiesData' => $statsService->getTopActivitiesData($user, $startDate, $endDate),
+            'activityMoodMatrixData' => $statsService->getActivityMoodMatrixData($user, $startDate, $endDate),
         ]);
     }
 }
