@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mis Estadísticas{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">📊 Análisis Personal</h1>
+        <p class="text-muted mb-0">Comprende tus emociones y hábitos</p>
+    </div>
+
+    <div class="row">
+        {# Tarjeta 1: Evolución Semanal #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-chart-line text-primary me-2"></i> Evolución (Semana)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-datos-value="{{ moodChartData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta 2: Evolución Mensual #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-calendar-days text-success me-2"></i> Evolución (Mes)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-datos-value="{{ monthlyChartData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta 3: Top Actividades (Donut) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-trophy text-warning me-2"></i> Top 5 Actividades
+                    </h5>
+                </div>
+                <div class="card-body" style="position: relative; height: 300px;">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="doughnut"
+                        data-chart-datos-value="{{ topActivitiesData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta 4: Matriz Actividad-Emoción (Barras) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-bolt text-info me-2"></i> Impacto en el Ánimo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {# Aquí le decimos que sea de tipo 'bar' (Barras) #}
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-datos-value="{{ activityMoodMatrixData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
