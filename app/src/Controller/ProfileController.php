@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Form\ProfileType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -16,6 +19,28 @@ final class ProfileController extends AbstractController
     {
         return $this->render('profile/index.html.twig', [
             'user' => $this->getUser(),
+        ]);
+    }
+
+    #[Route('/edit', name: 'app_profile_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        $form = $this->createForm(ProfileType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Tus datos se han actualizado correctamente.');
+
+            return $this->redirectToRoute('app_profile_index');
+        }
+
+        return $this->render('profile/edit.html.twig', [
+            'user' => $user,
+            'form' => $form,
         ]);
     }
 }
