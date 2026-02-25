@@ -109,6 +109,56 @@
             </div>
         </div>
 
+        {# RADAR DE CONTEXTO (Nube de Etiquetas) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-tags text-primary me-2"></i> Radar de Contexto
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    {# 🌟 Potenciadores (Días Felices) #}
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-up text-success"></i> Tus Potenciadores (Notas Altas)</h6>
+                        {% if tagContextData.positive is empty %}
+                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota mayor o igual a 8 en este periodo.</p>
+                        {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for name, data in tagContextData.positive %}
+                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
+                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
+                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="text-muted">
+
+                    {# ⚓ Frenos (Días Difíciles) #}
+                    <div>
+                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-down text-danger"></i> Tus Frenos (Notas Bajas)</h6>
+                        {% if tagContextData.negative is empty %}
+                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota menor o igual a 4 en este periodo.</p>
+                        {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for name, data in tagContextData.negative %}
+                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
+                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
+                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 {% endblock %}
