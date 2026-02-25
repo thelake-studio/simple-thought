@@ -13,44 +13,51 @@ class StatsService
     }
 
     /**
-     * Calcula los datos de la gráfica de evolución semanal.
+     * Evolución del Ánimo Dinámica: Calcula la media de ánimo en un rango de fechas.
      */
-    public function getWeeklyMoodData(User $user): array
+    public function getMoodEvolutionData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $monday = new \DateTime('monday this week');
-        $sunday = new \DateTime('sunday this week');
-        $entries = $this->entryRepository->findEntriesBetweenDates($user, $monday, $sunday);
+        // 1. Buscamos las entradas en ese rango específico
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
-        $weeklyData = [
-            'Lunes' => [], 'Martes' => [], 'Miércoles' => [],
-            'Jueves' => [], 'Viernes' => [], 'Sábado' => [], 'Domingo' => []
-        ];
+        // 2. Generamos un array con todos los días del rango
+        $period = new \DatePeriod(
+            $startDate,
+            new \DateInterval('P1D'),
+            (clone $endDate)->modify('+1 day')
+        );
 
-        $diasSemana = [
-            'Monday' => 'Lunes', 'Tuesday' => 'Martes', 'Wednesday' => 'Miércoles',
-            'Thursday' => 'Jueves', 'Friday' => 'Viernes', 'Saturday' => 'Sábado', 'Sunday' => 'Domingo'
-        ];
+        $dailyData = [];
+        foreach ($period as $date) {
+            $dailyData[$date->format('d/m')] = [];
+        }
 
+        // 3. Rellenamos el array con las notas de ánimo de las entradas reales
         foreach ($entries as $entry) {
-            $dayNameEnglish = $entry->getDate()->format('l');
-            $dayNameSpanish = $diasSemana[$dayNameEnglish];
-
             if ($entry->getMoodValueSnapshot() !== null) {
-                $weeklyData[$dayNameSpanish][] = $entry->getMoodValueSnapshot();
+                $dateKey = $entry->getDate()->format('d/m');
+
+                if (isset($dailyData[$dateKey])) {
+                    $dailyData[$dateKey][] = $entry->getMoodValueSnapshot();
+                }
             }
         }
 
-        $chartDataPoints = [];
-        foreach ($weeklyData as $values) {
-            $chartDataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
+        // 4. Calculamos la media de cada día
+        $labels = [];
+        $dataPoints = [];
+        foreach ($dailyData as $day => $values) {
+            $labels[] = $day;
+            $dataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
         }
 
+        // 5. Devolvemos el formato de Chart.js
         return [
-            'labels' => array_keys($weeklyData),
+            'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Nivel de Ánimo',
-                    'data' => $chartDataPoints,
+                    'label' => 'Evolución del Ánimo',
+                    'data' => $dataPoints,
                     'borderColor' => '#0d6efd',
                     'backgroundColor' => 'rgba(13, 110, 253, 0.2)',
                     'tension' => 0.4,
@@ -62,61 +69,15 @@ class StatsService
     }
 
     /**
-     * Calcula los datos de la gráfica de evolución mensual.
+     * Top Actividades: Ahora dinámico por fechas
      */
-    public function getMonthlyMoodData(User $user): array
+    public function getTopActivitiesData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $firstDayOfMonth = new \DateTime('first day of this month');
-        $lastDayOfMonth = new \DateTime('last day of this month');
-        $monthlyEntries = $this->entryRepository->findEntriesBetweenDates($user, $firstDayOfMonth, $lastDayOfMonth);
+        // 1. Usamos la misma consulta que creamos para la evolución
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
-        $daysInMonth = (int) $lastDayOfMonth->format('t');
-
-        // Inicializamos el array del mes (del 1 al 28/30/31)
-        $monthlyData = [];
-        for ($i = 1; $i <= $daysInMonth; $i++) {
-            $monthlyData[$i] = [];
-        }
-
-        foreach ($monthlyEntries as $entry) {
-            $dayOfMonth = (int) $entry->getDate()->format('j');
-            if ($entry->getMoodValueSnapshot() !== null) {
-                $monthlyData[$dayOfMonth][] = $entry->getMoodValueSnapshot();
-            }
-        }
-
-        $chartDataPoints = [];
-        $labels = [];
-        foreach ($monthlyData as $day => $values) {
-            $labels[] = $day;
-            $chartDataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
-        }
-
-        return [
-            'labels' => $labels,
-            'datasets' => [
-                [
-                    'label' => 'Nivel de Ánimo',
-                    'data' => $chartDataPoints,
-                    'borderColor' => '#198754',
-                    'backgroundColor' => 'rgba(25, 135, 84, 0.2)',
-                    'tension' => 0.4,
-                    'fill' => true,
-                    'spanGaps' => true
-                ]
-            ]
-        ];
-    }
-
-    /**
-     * Calcula el Top 5 de actividades más realizadas.
-     */
-    public function getTopActivitiesData(User $user): array
-    {
-        $entries = $this->entryRepository->findAllByUser($user);
         $activityCounts = [];
 
-        // 1. Contamos las actividades de cada entrada
         foreach ($entries as $entry) {
             foreach ($entry->getActivities() as $activity) {
                 $name = $activity->getName();
@@ -127,79 +88,60 @@ class StatsService
             }
         }
 
-        // 2. Ordenamos de mayor a menor y cogemos las 5 primeras
         arsort($activityCounts);
         $topActivities = array_slice($activityCounts, 0, 5, true);
 
-        // 3. Paleta de colores chula para el Donut
-        $backgroundColors = [
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-        ];
-
-        // 4. Formato Chart.js
         return [
             'labels' => array_keys($topActivities),
             'datasets' => [
                 [
-                    'label' => 'Veces realizada',
                     'data' => array_values($topActivities),
-                    'backgroundColor' => array_slice($backgroundColors, 0, count($topActivities)),
-                    'borderWidth' => 2,
-                    'borderColor' => '#ffffff'
+                    'backgroundColor' => ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db'],
+                    'borderWidth' => 0,
+                    'hoverOffset' => 4
                 ]
             ]
         ];
     }
 
     /**
-     * Matriz Actividad-Emoción: Calcula la media de ánimo por cada actividad.
+     * Matriz de Impacto: Ahora dinámica por fechas
      */
-    public function getActivityMoodMatrixData(User $user): array
+    public function getActivityMoodMatrixData(User $user, \DateTime $startDate, \DateTime $endDate): array
     {
-        $entries = $this->entryRepository->findAllByUser($user);
+        // 1. Filtramos por fechas
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+
         $activityMoods = [];
 
-        // 1. Recopilamos todos los valores de ánimo asociados a cada actividad
         foreach ($entries as $entry) {
-            $moodValue = $entry->getMoodValueSnapshot();
-
-            // Solo contamos si la entrada tiene un estado de ánimo registrado
-            if ($moodValue !== null) {
+            if ($entry->getMoodValueSnapshot() !== null) {
                 foreach ($entry->getActivities() as $activity) {
                     $name = $activity->getName();
                     if (!isset($activityMoods[$name])) {
                         $activityMoods[$name] = [];
                     }
-                    $activityMoods[$name][] = $moodValue;
+                    $activityMoods[$name][] = $entry->getMoodValueSnapshot();
                 }
             }
         }
 
-        // 2. Calculamos la media matemática para cada actividad
-        $activityAverages = [];
+        $matrixData = [];
         foreach ($activityMoods as $name => $moods) {
-            $activityAverages[$name] = array_sum($moods) / count($moods);
+            $matrixData[$name] = count($moods) > 0 ? array_sum($moods) / count($moods) : 0;
         }
 
-        // 3. Ordenamos de mayor a menor para ver qué nos hace más felices
-        arsort($activityAverages);
+        arsort($matrixData);
+        $topMatrix = array_slice($matrixData, 0, 7, true);
 
-        // Nos quedamos con el Top 7 para que la gráfica se vea limpia
-        $topActivities = array_slice($activityAverages, 0, 7, true);
-
-        // 4. Formato Chart.js
         return [
-            'labels' => array_keys($topActivities),
+            'labels' => array_keys($topMatrix),
             'datasets' => [
                 [
-                    'label' => 'Media de Ánimo (Sobre 10)',
-                    'data' => array_values($topActivities),
-                    'backgroundColor' => 'rgba(153, 102, 255, 0.6)',
-                    'borderColor' => '#9966ff',
+                    'label' => 'Nota Media del Ánimo',
+                    'data' => array_values($topMatrix),
+                    'backgroundColor' => 'rgba(155, 89, 182, 0.7)',
+                    'borderColor' => '#8e44ad',
                     'borderWidth' => 1
                 ]
             ]
