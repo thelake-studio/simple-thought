@@ -41,6 +41,7 @@ final class StatsController extends AbstractController
             'activityMoodMatrixData' => $statsService->getActivityMoodMatrixData($user, $startDate, $endDate),
             'goalMoodCorrelationData' => $statsService->getGoalMoodCorrelationData($user, $startDate, $endDate),
             'tagContextData' => $statsService->getTagContextData($user, $startDate, $endDate),
+            'yearInPixelsData' => $statsService->getYearInPixelsData($user, $startDate),
         ]);
     }
 }

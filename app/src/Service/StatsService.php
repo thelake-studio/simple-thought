@@ -258,4 +258,60 @@ class StatsService
             'negative' => array_slice($negativeTags, 0, 3, true),
         ];
     }
+
+    /**
+     * El Año en Píxeles: Genera una matriz de 12 meses x 31 días con la nota media de cada día.
+     */
+    public function getYearInPixelsData(User $user, \DateTime $referenceDate): array
+    {
+        // 1. Obtenemos el año que el usuario está consultando
+        $year = $referenceDate->format('Y');
+
+        // Calculamos el inicio y fin de ESE año
+        $startDate = new \DateTime("$year-01-01 00:00:00");
+        $endDate = new \DateTime("$year-12-31 23:59:59");
+
+        // 2. Buscamos todas las entradas de ese año
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+
+        // 3. Preparamos el calendario vacío
+        $calendar = [];
+        for ($m = 1; $m <= 12; $m++) {
+            // SOLUCIÓN: Usamos DateTime ('t' devuelve el número de días del mes) en lugar de cal_days_in_month
+            $dateForMonth = new \DateTime(sprintf('%04d-%02d-01', $year, $m));
+            $daysInMonth = (int) $dateForMonth->format('t');
+
+            for ($d = 1; $d <= $daysInMonth; $d++) {
+                $calendar[$m][$d] = null; // null significa "sin datos"
+            }
+        }
+
+        // 4. Agrupamos las notas de ánimo de las entradas reales por Mes y Día
+        $dailyMoods = [];
+        foreach ($entries as $entry) {
+            if ($entry->getMoodValueSnapshot() !== null) {
+                $m = (int) $entry->getDate()->format('n'); // Mes sin ceros iniciales (1-12)
+                $d = (int) $entry->getDate()->format('j'); // Día sin ceros iniciales (1-31)
+
+                if (!isset($dailyMoods[$m][$d])) {
+                    $dailyMoods[$m][$d] = [];
+                }
+                $dailyMoods[$m][$d][] = $entry->getMoodValueSnapshot();
+            }
+        }
+
+        // 5. Calculamos la media de cada día y la guardamos en el calendario
+        foreach ($dailyMoods as $m => $days) {
+            foreach ($days as $d => $moods) {
+                // Redondeamos la nota a número entero para poder asignarle un color luego
+                $calendar[$m][$d] = (int) round(array_sum($moods) / count($moods));
+            }
+        }
+
+        // Devolvemos el año y la matriz de meses/días
+        return [
+            'year' => $year,
+            'calendar' => $calendar
+        ];
+    }
 }
