@@ -4,7 +4,7 @@
 > *Trabajo de Fin de Grado (TFG) - Desarrollo de Aplicaciones Web.*
 
 ![Estado](https://img.shields.io/badge/Estado-En_Desarrollo-green)
-![Versión](https://img.shields.io/badge/Versión-v0.4.0-blue)
+![Versión](https://img.shields.io/badge/Versión-v0.5.0-blue)
 ![Stack](https://img.shields.io/badge/Symfony-6.4%2B-black)
 
 ## 📖 Descripción
@@ -12,9 +12,7 @@
 
 ---
 
-## 🚀 Funcionalidades (v0.4.0)
-
-Esta versión introduce el módulo de **Gestión de Usuarios y Seguridad**, convirtiendo la aplicación en un sistema multiusuario real y robusto:
+## 🚀 Funcionalidades (v0.5.0)
 
 ### 1. El Diario (Core Module)
 * **Registro Contextual**: Vinculación de emociones, actividades y etiquetas.
@@ -25,17 +23,22 @@ Esta versión introduce el módulo de **Gestión de Usuarios y Seguridad**, conv
 * **Objetivos de Racha (Streaks)**: Contador visual de días consecutivos para hábitos.
 * **Objetivos Acumulativos (Sum)**: Metas cuantificables con barras de progreso dinámicas.
 
-### 3. Dashboard de Analíticas (v0.3.0)
+### 3. Dashboard de Analíticas Base (v0.3.0)
 Visualización de datos mediante **Chart.js** y **Stimulus**, procesados a través de una capa de servicio especializada (`StatsService`):
-* **Evolución del Ánimo**: Gráficas de líneas para el seguimiento semanal y mensual.
 * **Frecuencia de Actividades**: Gráfico circular (Doughnut) que identifica las actividades más recurrentes.
 * **Matriz de Impacto Emocional**: Gráfico de barras que correlaciona actividades con la media de bienestar percibido.
 
-### 4. Gestión de Usuarios y Seguridad (NUEVO v0.4.0)
+### 4. Gestión de Usuarios y Seguridad (v0.4.0)
 * **Autenticación Fluida**: Sistema de registro e inicio de sesión con UI simétrica y diseño responsivo.
 * **Perfil de Usuario (CRUD)**: Panel privado para visualizar y editar datos personales.
 * **Privacidad Total (Zona de Peligro)**: Sistema de borrado de cuenta definitivo con validación CSRF y eliminación en cascada de todos los datos asociados.
-* **Arquitectura Segura**: Rutas protegidas mediante firewalls de Symfony y atributos `#[IsGranted]`.
+
+### 5. Estadísticas Avanzadas e Interactividad (NUEVO v0.5.0)
+* **Filtros Dinámicos**: Selector global de fechas para recalcular todas las métricas del dashboard simultáneamente.
+* **Gráfica Maestra**: Evolución del estado de ánimo adaptativa según el rango temporal seleccionado.
+* **Correlación Objetivos vs. Ánimo**: Gráfica comparativa que analiza el impacto de cumplir metas en tu bienestar general.
+* **Radar de Contexto**: Identificación automática de etiquetas "Potenciadoras" (días con notas altas) y "Frenos" (días con notas bajas).
+* **El Año en Píxeles**: Mapa de calor anual (Heatmap) generado de forma nativa para visualizar tendencias emocionales a largo plazo sin dependencias de terceros.
 
 ---
 
@@ -53,10 +56,10 @@ Visualización de datos mediante **Chart.js** y **Stimulus**, procesados a trav�
 - [x] **Fase 2: Gestión de Objetivos (v0.2.0)** - *Completado*
 - [x] **Fase 3: Estadísticas y Analíticas (v0.3.0)** - *Completado*
 - [x] **Fase 4: Gestión de Usuarios Pro (v0.4.0)** - *Completado*
-- [ ] **Fase 5: Estadísticas Avanzadas e Interactividad** - *Próximamente*
-    - Filtros por fecha dinámicos.
-    - Exportación de reportes.
-- [ ] **Fase 6: Optimización y Calidad de Código**
+- [x] **Fase 5: Estadísticas Avanzadas e Interactividad (v0.5.0)** - *Completado*
+- [ ] **Fase 6: Optimización y Calidad de Código** - *Próximamente*
+    - Manejo de errores personalizados (404, 403).
+    - Documentación PHPDoc y refactorización.
 - [ ] **Fase 7: UI/UX y Pulido Final**
 
 ---
