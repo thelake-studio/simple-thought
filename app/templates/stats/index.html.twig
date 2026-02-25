@@ -91,6 +91,147 @@
             </div>
         </div>
 
+        {# CRUCE: OBJETIVOS VS ÁNIMO (Barras comparativas) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-bullseye text-success me-2"></i> Objetivos vs. Ánimo
+                    </h5>
+                </div>
+                <div class="card-body" style="position: relative; height: 300px;">
+                    <canvas
+                        data-controller="chart"
+                        data-chart-type-value="bar"
+                        data-chart-datos-value="{{ goalMoodCorrelationData|json_encode }}"
+                    ></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# RADAR DE CONTEXTO (Nube de Etiquetas) #}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-tags text-primary me-2"></i> Radar de Contexto
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    {# 🌟 Potenciadores (Días Felices) #}
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-up text-success"></i> Tus Potenciadores (Notas Altas)</h6>
+                        {% if tagContextData.positive is empty %}
+                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota mayor o igual a 8 en este periodo.</p>
+                        {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for name, data in tagContextData.positive %}
+                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
+                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
+                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <hr class="text-muted">
+
+                    {# ⚓ Frenos (Días Difíciles) #}
+                    <div>
+                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-down text-danger"></i> Tus Frenos (Notas Bajas)</h6>
+                        {% if tagContextData.negative is empty %}
+                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota menor o igual a 4 en este periodo.</p>
+                        {% else %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for name, data in tagContextData.negative %}
+                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
+                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
+                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {# 3. EL AÑO EN PÍXELES (Mapa de Calor) #}
+    <div class="row mt-2">
+        <div class="col-12 mb-5">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fa-solid fa-calendar-days text-primary me-2"></i> Tu Año en Píxeles ({{ yearInPixelsData.year }})
+                    </h5>
+                </div>
+                <div class="card-body">
+
+                    {# Contenedor Responsive para la tabla #}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered text-center mb-0" style="table-layout: fixed; min-width: 600px;">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th style="width: 45px;" class="text-muted small">Día</th>
+                                    {% set meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] %}
+                                    {% for mes in meses %}
+                                        <th class="text-muted small">{{ mes }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {# Bucle de 31 días (Filas) #}
+                                {% for d in 1..31 %}
+                                    <tr>
+                                        <td class="bg-light text-muted small fw-bold align-middle">{{ d }}</td>
+
+                                        {# Bucle de 12 meses (Columnas) #}
+                                        {% for m in 1..12 %}
+                                            {# Extraemos la nota de la matriz (usamos ?? null por si el día no existe en ese mes, como el 30 de febrero) #}
+                                            {% set note = yearInPixelsData.calendar[m][d] ?? null %}
+
+                                            {# Asignamos el color según la nota #}
+                                            {% set bgColor = '#f8f9fa' %} {# Por defecto: Gris muy clarito (vacío) #}
+                                            {% if note is not null %}
+                                                {% if note >= 9 %} {% set bgColor = '#198754' %} {# Verde oscuro (9-10) #}
+                                                {% elseif note >= 7 %} {% set bgColor = '#20c997' %} {# Verde claro (7-8) #}
+                                                {% elseif note >= 5 %} {% set bgColor = '#ffc107' %} {# Amarillo (5-6) #}
+                                                {% elseif note >= 3 %} {% set bgColor = '#fd7e14' %} {# Naranja (3-4) #}
+                                                {% else %} {% set bgColor = '#dc3545' %} {# Rojo (1-2) #}
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {# Pintamos la celda. Le ponemos un 'title' para que al pasar el ratón se vea la nota exacta #}
+                                            <td style="background-color: {{ bgColor }}; height: 25px; cursor: help; transition: filter 0.2s;"
+                                                title="Día {{ d }}/{{ m }} - {% if note is not null %}Nota media: {{ note }}{% else %}Sin registros{% endif %}"
+                                                onmouseover="this.style.filter='brightness(0.8)'"
+                                                onmouseout="this.style.filter='brightness(1)'">
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Leyenda de colores #}
+                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 text-muted small">
+                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #198754; width:15px; height:15px;">&nbsp;</span> Excelente (9-10)</span>
+                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #20c997; width:15px; height:15px;">&nbsp;</span> Bueno (7-8)</span>
+                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #ffc107; width:15px; height:15px;">&nbsp;</span> Regular (5-6)</span>
+                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #fd7e14; width:15px; height:15px;">&nbsp;</span> Difícil (3-4)</span>
+                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #dc3545; width:15px; height:15px;">&nbsp;</span> Malo (1-2)</span>
+                        <span class="d-flex align-items-center"><span class="border rounded me-1" style="background-color: #f8f9fa; width:15px; height:15px;">&nbsp;</span> Sin datos</span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
 </div>
 {% endblock %}

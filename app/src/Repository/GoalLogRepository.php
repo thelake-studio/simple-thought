@@ -72,4 +72,18 @@ class GoalLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findLogsBetweenDates(\App\Entity\User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        return $this->createQueryBuilder('gl')
+            ->join('gl.goal', 'g')
+            ->andWhere('g.user = :user')
+            ->andWhere('gl.date >= :start')
+            ->andWhere('gl.date <= :end')
+            ->setParameter('user', $user)
+            ->setParameter('start', $startDate->format('Y-m-d 00:00:00'))
+            ->setParameter('end', $endDate->format('Y-m-d 23:59:59'))
+            ->getQuery()
+            ->getResult();
+    }
 }
