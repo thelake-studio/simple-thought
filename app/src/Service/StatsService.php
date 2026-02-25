@@ -202,4 +202,60 @@ class StatsService
             ]
         ];
     }
+
+    /**
+     * Radar de Contexto: Top etiquetas asociadas a días muy buenos (>= 8) y muy malos (<= 4).
+     */
+    public function getTagContextData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    {
+        // 1. Obtenemos las entradas del rango de fechas
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+
+        $positiveTags = [];
+        $negativeTags = [];
+
+        // 2. Clasificamos las etiquetas según el ánimo del día
+        foreach ($entries as $entry) {
+            $mood = $entry->getMoodValueSnapshot();
+
+            // Si el día no tiene nota, lo saltamos
+            if ($mood === null) {
+                continue;
+            }
+
+            $tags = $entry->getTags();
+
+            // Días muy felices (8, 9, 10)
+            if ($mood >= 8) {
+                foreach ($tags as $tag) {
+                    $name = $tag->getName();
+                    if (!isset($positiveTags[$name])) {
+                        // Guardamos también su color para pintarlo luego en Twig
+                        $positiveTags[$name] = ['count' => 0, 'color' => $tag->getColor() ?? '#198754'];
+                    }
+                    $positiveTags[$name]['count']++;
+                }
+            }
+            // Días difíciles (1, 2, 3, 4)
+            elseif ($mood <= 4) {
+                foreach ($tags as $tag) {
+                    $name = $tag->getName();
+                    if (!isset($negativeTags[$name])) {
+                        $negativeTags[$name] = ['count' => 0, 'color' => $tag->getColor() ?? '#dc3545'];
+                    }
+                    $negativeTags[$name]['count']++;
+                }
+            }
+        }
+
+        // 3. Ordenamos las cajas de mayor a menor número de repeticiones (count)
+        uasort($positiveTags, fn($a, $b) => $b['count'] <=> $a['count']);
+        uasort($negativeTags, fn($a, $b) => $b['count'] <=> $a['count']);
+
+        // 4. Devolvemos solo el Top 3 de cada caja
+        return [
+            'positive' => array_slice($positiveTags, 0, 3, true),
+            'negative' => array_slice($negativeTags, 0, 3, true),
+        ];
+    }
 }
