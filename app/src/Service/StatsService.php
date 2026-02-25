@@ -4,11 +4,13 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\EntryRepository;
+use App\Repository\GoalLogRepository;
 
 class StatsService
 {
     public function __construct(
-        private readonly EntryRepository $entryRepository
+        private readonly EntryRepository $entryRepository,
+        private readonly GoalLogRepository $goalLogRepository
     ) {
     }
 
@@ -142,6 +144,59 @@ class StatsService
                     'data' => array_values($topMatrix),
                     'backgroundColor' => 'rgba(155, 89, 182, 0.7)',
                     'borderColor' => '#8e44ad',
+                    'borderWidth' => 1
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Métrica Cruzada: Ánimo en días con objetivos vs. días sin objetivos
+     */
+    public function getGoalMoodCorrelationData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    {
+        // 1. Extraemos las entradas y los progresos de ese periodo
+        $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
+        $goalLogs = $this->goalLogRepository->findLogsBetweenDates($user, $startDate, $endDate);
+
+        // 2. Creamos un "calendario" rápido para saber qué días hubo avance
+        $daysWithGoals = [];
+        foreach ($goalLogs as $log) {
+            $daysWithGoals[$log->getDate()->format('Y-m-d')] = true;
+        }
+
+        // 3. Separamos las notas de ánimo en dos cajas
+        $moodsWithGoals = [];
+        $moodsWithoutGoals = [];
+
+        foreach ($entries as $entry) {
+            if ($entry->getMoodValueSnapshot() !== null) {
+                $dateString = $entry->getDate()->format('Y-m-d');
+
+                if (isset($daysWithGoals[$dateString])) {
+                    $moodsWithGoals[] = $entry->getMoodValueSnapshot();
+                } else {
+                    $moodsWithoutGoals[] = $entry->getMoodValueSnapshot();
+                }
+            }
+        }
+
+        // 4. Calculamos las medias (evitando división por cero si no hay datos)
+        $avgWithGoals = count($moodsWithGoals) > 0 ? array_sum($moodsWithGoals) / count($moodsWithGoals) : 0;
+        $avgWithoutGoals = count($moodsWithoutGoals) > 0 ? array_sum($moodsWithoutGoals) / count($moodsWithoutGoals) : 0;
+
+        // 5. Preparamos el formato para Chart.js
+        return [
+            'labels' => ['Avanzando en objetivos', 'Sin avances registrados'],
+            'datasets' => [
+                [
+                    'label' => 'Nota Media del Ánimo',
+                    'data' => [round($avgWithGoals, 2), round($avgWithoutGoals, 2)],
+                    'backgroundColor' => [
+                        'rgba(46, 204, 113, 0.7)',
+                        'rgba(231, 76, 60, 0.7)'
+                    ],
+                    'borderColor' => ['#27ae60', '#c0392b'],
                     'borderWidth' => 1
                 ]
             ]
