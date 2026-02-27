@@ -10,8 +10,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmotionType extends AbstractType
+/**
+ * Formulario para la creación y edición de Emociones.
+ * Define los campos y atributos visuales requeridos para interactuar con la entidad Emotion.
+ */
+final class EmotionType extends AbstractType
 {
+    /**
+     * Construye el formulario añadiendo los campos necesarios.
+     *
+     * @param FormBuilderInterface $builder El constructor del formulario.
+     * @param array $options Opciones adicionales para el formulario.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -34,6 +45,13 @@ class EmotionType extends AbstractType
         ;
     }
 
+    /**
+     * Configura las opciones por defecto del formulario.
+     * Vincula este formulario directamente con la entidad Emotion.
+     *
+     * @param OptionsResolver $resolver El resolutor de opciones de Symfony.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
