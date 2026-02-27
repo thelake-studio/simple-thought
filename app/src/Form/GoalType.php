@@ -10,8 +10,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class GoalType extends AbstractType
+/**
+ * Formulario para la creación y edición de Objetivos (Goals).
+ * Permite configurar el tipo de meta (racha o acumulativa), su periodicidad y el valor objetivo.
+ */
+final class GoalType extends AbstractType
 {
+    /**
+     * Construye el formulario añadiendo los campos necesarios.
+     *
+     * @param FormBuilderInterface $builder El constructor del formulario.
+     * @param array $options Opciones adicionales para el formulario.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -46,6 +57,13 @@ class GoalType extends AbstractType
         ;
     }
 
+    /**
+     * Configura las opciones por defecto del formulario.
+     * Vincula este formulario directamente con la entidad Goal.
+     *
+     * @param OptionsResolver $resolver El resolutor de opciones de Symfony.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
