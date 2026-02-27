@@ -16,16 +16,33 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
+/**
+ * Autenticador personalizado para el inicio de sesión de la aplicación.
+ * Gestiona la validación de credenciales, la creación del pasaporte de seguridad
+ * y las redirecciones tras un inicio de sesión exitoso.
+ */
+final class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
+    /**
+     * Inicializa el autenticador inyectando las dependencias necesarias.
+     *
+     * @param UrlGeneratorInterface $urlGenerator Servicio para generar rutas dentro de la aplicación.
+     */
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator
+    ) {
     }
 
+    /**
+     * Procesa la petición de inicio de sesión y crea un pasaporte con las credenciales del usuario.
+     *
+     * @param Request $request Petición HTTP entrante con los datos del formulario.
+     * @return Passport El pasaporte de seguridad con insignias (badges) como CSRF y RememberMe.
+     */
     public function authenticate(Request $request): Passport
     {
         $email = $request->getPayload()->getString('email');
@@ -42,6 +59,14 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
         );
     }
 
+    /**
+     * Maneja la redirección del usuario una vez que se ha autenticado correctamente.
+     *
+     * @param Request $request Petición HTTP actual.
+     * @param TokenInterface $token El token de seguridad generado tras el login.
+     * @param string $firewallName El nombre del firewall actual.
+     * @return Response|null Respuesta HTTP de redirección al destino previo o a la ruta principal.
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
@@ -51,6 +76,12 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
         return new RedirectResponse($this->urlGenerator->generate('app_home'));
     }
 
+    /**
+     * Devuelve la URL absoluta de la página de inicio de sesión.
+     *
+     * @param Request $request Petición HTTP actual.
+     * @return string La ruta generada para el login.
+     */
     protected function getLoginUrl(Request $request): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);
