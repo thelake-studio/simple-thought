@@ -6,25 +6,50 @@ use App\Entity\Activity;
 use App\Form\ActivityType;
 use App\Repository\ActivityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controlador encargado de gestionar el CRUD de las actividades (Catálogo del usuario).
+ * Permite listar, crear, visualizar, editar y eliminar actividades personalizadas.
+ */
 #[Route('/activity')]
 #[IsGranted('ROLE_USER')]
 final class ActivityController extends AbstractController
 {
+    /**
+     * Constructor para inyectar las dependencias necesarias.
+     *
+     * @param ActivityRepository $activityRepository Repositorio para gestionar la base de datos de actividades.
+     */
+    public function __construct(
+        private readonly ActivityRepository $activityRepository
+    ) {
+    }
+
+    /**
+     * Muestra la lista de todas las actividades pertenecientes al usuario autenticado.
+     *
+     * @return Response La vista renderizada con la tabla de actividades.
+     */
     #[Route('/', name: 'app_activity_index', methods: ['GET'])]
-    public function index(ActivityRepository $activityRepository): Response
+    public function index(): Response
     {
         return $this->render('activity/index.html.twig', [
-            'activities' => $activityRepository->findAllByUser($this->getUser()),
+            'activities' => $this->activityRepository->findAllByUser($this->getUser()),
         ]);
     }
 
+    /**
+     * Muestra y procesa el formulario para crear una nueva actividad.
+     *
+     * @param Request $request La petición HTTP con los datos del formulario.
+     * @return Response Redirección al índice si tiene éxito, o la vista del formulario si no.
+     */
     #[Route('/new', name: 'app_activity_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, ActivityRepository $activityRepository): Response
+    public function new(Request $request): Response
     {
         $activity = new Activity();
         $form = $this->createForm(ActivityType::class, $activity);
@@ -32,9 +57,9 @@ final class ActivityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $activity->setUser($this->getUser());
-            $activityRepository->save($activity, true);
+            $this->activityRepository->save($activity, true);
 
-            $this->addFlash('success', 'Nueva actividad añadida.');
+            $this->addFlash('success', 'Nueva actividad añadida correctamente.');
 
             return $this->redirectToRoute('app_activity_index');
         }
@@ -45,18 +70,48 @@ final class ActivityController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_activity_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
+    /**
+     * Muestra el detalle de una actividad específica.
+     * Protege contra ataques IDOR verificando que la actividad pertenece al usuario actual.
+     *
+     * @param Activity $activity La actividad solicitada (inyectada por el ParamConverter).
+     * @return Response La vista de detalle o redirección segura si no hay permisos.
+     */
+    #[Route('/{id}', name: 'app_activity_show', methods: ['GET'])]
+    public function show(Activity $activity): Response
     {
         if ($activity->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('No puedes editar una actividad que no es tuya.');
+            $this->addFlash('error', 'No tienes permiso para ver esta actividad.');
+
+            return $this->redirectToRoute('app_activity_index');
+        }
+
+        return $this->render('activity/show.html.twig', [
+            'activity' => $activity,
+        ]);
+    }
+
+    /**
+     * Muestra y procesa el formulario de edición de una actividad.
+     *
+     * @param Request $request La petición HTTP.
+     * @param Activity $activity La actividad a editar.
+     * @return Response Redirección al índice si tiene éxito, o la vista del formulario si no.
+     */
+    #[Route('/{id}/edit', name: 'app_activity_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Activity $activity): Response
+    {
+        if ($activity->getUser() !== $this->getUser()) {
+            $this->addFlash('error', 'No tienes permiso para editar esta actividad.');
+
+            return $this->redirectToRoute('app_activity_index');
         }
 
         $form = $this->createForm(ActivityType::class, $activity);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $activityRepository->save($activity, true);
+            $this->activityRepository->save($activity, true);
 
             $this->addFlash('success', 'Actividad actualizada correctamente.');
 
@@ -69,29 +124,29 @@ final class ActivityController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_activity_show', methods: ['GET'])]
-    public function show(Activity $activity): Response
-    {
-        if ($activity->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('No puedes ver una actividad que no es tuya.');
-        }
-
-        return $this->render('activity/show.html.twig', [
-            'activity' => $activity,
-        ]);
-    }
-
+    /**
+     * Elimina una actividad de la base de datos de forma segura.
+     * Valida el token CSRF y la propiedad de la entidad.
+     *
+     * @param Request $request La petición HTTP para validar el token.
+     * @param Activity $activity La actividad a eliminar.
+     * @return Response Redirección al índice de actividades tras la operación.
+     */
     #[Route('/{id}', name: 'app_activity_delete', methods: ['POST'])]
-    public function delete(Request $request, Activity $activity, ActivityRepository $activityRepository): Response
+    public function delete(Request $request, Activity $activity): Response
     {
-        // Seguridad: Verificar propiedad
         if ($activity->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para eliminar esta actividad.');
+
+            return $this->redirectToRoute('app_activity_index');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$activity->getId(), $request->request->get('_token'))) {
-            $activityRepository->remove($activity, true);
-            $this->addFlash('success', 'Actividad eliminada.');
+        // Validación del token CSRF del formulario oculto en la vista
+        if ($this->isCsrfTokenValid('delete'.$activity->getId(), (string) $request->request->get('_token'))) {
+            $this->activityRepository->remove($activity, true);
+            $this->addFlash('success', 'Actividad eliminada con éxito.');
+        } else {
+            $this->addFlash('error', 'Token de seguridad inválido. No se pudo eliminar.');
         }
 
         return $this->redirectToRoute('app_activity_index');
