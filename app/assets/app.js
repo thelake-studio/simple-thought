@@ -1,12 +1,9 @@
-// assets/app.js
+/**
+ * Punto de entrada principal para los assets del frontend de la aplicación.
+ * Se encarga de importar la hoja de estilos global, el framework Bootstrap
+ * y de inicializar la aplicación y los controladores de Stimulus.
+ */
 
-// 1. Importamos el CSS
 import './styles/app.css';
-
-// 2. Importamos el JS de Bootstrap
 import 'bootstrap';
-
-// 3. Importamos Stimulus
 import './stimulus_bootstrap.js';
-
-console.log('AssetMapper: JS y CSS cargados correctamente 🧠');
