@@ -11,9 +11,14 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad de Usuario que gestiona la identidad, autenticación y seguridad del sistema.
+ * Implementa UserInterface para integrarse con el firewall de Symfony y
+ * PasswordAuthenticatedUserInterface para el manejo de credenciales hash.
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[UniqueEntity(fields: ['email'], message: 'Ya existe una cuenta vinculada a este correo electrónico.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -27,13 +32,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
-     * @var list<string> The user roles
+     * @var list<string> Los roles asignados al usuario para el control de acceso.
      */
     #[ORM\Column]
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string La contraseña cifrada del usuario.
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -55,35 +60,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     /**
-     * @var Collection<int, Emotion>
+     * @var Collection<int, Emotion> Colección de emociones personalizadas.
      */
     #[ORM\OneToMany(targetEntity: Emotion::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $emotions;
 
     /**
-     * @var Collection<int, Entry>
+     * @var Collection<int, Entry> Colección de entradas del diario emocional.
      */
     #[ORM\OneToMany(targetEntity: Entry::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $entries;
 
     /**
-     * @var Collection<int, Activity>
+     * @var Collection<int, Activity> Colección de actividades del catálogo.
      */
     #[ORM\OneToMany(targetEntity: Activity::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $activities;
 
     /**
-     * @var Collection<int, Tag>
+     * @var Collection<int, Tag> Colección de etiquetas creadas.
      */
     #[ORM\OneToMany(targetEntity: Tag::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $tags;
 
     /**
-     * @var Collection<int, Goal>
+     * @var Collection<int, Goal> Colección de objetivos definidos.
      */
     #[ORM\OneToMany(targetEntity: Goal::class, mappedBy: 'user')]
     private Collection $goals;
 
+    /**
+     * Inicializa las colecciones de las relaciones OneToMany.
+     */
     public function __construct()
     {
         $this->emotions = new ArrayCollection();
@@ -93,16 +101,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->goals = new ArrayCollection();
     }
 
+    /**
+     * @return int|null Identificador único de la entidad.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null Correo electrónico del usuario.
+     */
     public function getEmail(): ?string
     {
         return $this->email;
     }
 
+    /**
+     * @param string $email Nuevo correo electrónico.
+     * @return static
+     */
     public function setEmail(string $email): static
     {
         $this->email = $email;
@@ -111,9 +129,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * Identificador visual que representa al usuario ante el sistema de seguridad.
      *
      * @see UserInterface
+     * @return string
      */
     public function getUserIdentifier(): string
     {
@@ -121,19 +140,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Obtiene los roles del usuario, garantizando siempre el ROLE_USER.
+     *
      * @see UserInterface
+     * @return array
      */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
 
     /**
-     * @param list<string> $roles
+     * @param list<string> $roles Lista de roles asignados.
+     * @return static
      */
     public function setRoles(array $roles): static
     {
@@ -143,13 +165,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Obtiene la contraseña hash de la base de datos.
+     *
      * @see PasswordAuthenticatedUserInterface
+     * @return string|null
      */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
+    /**
+     * @param string $password Contraseña ya cifrada.
+     * @return static
+     */
     public function setPassword(string $password): static
     {
         $this->password = $password;
@@ -158,7 +187,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Ensure the session doesn't contain actual password hashes by CRC32C-hashing them, as supported since Symfony 7.3.
+     * Sobrescribe la serialización para asegurar que no se guarden hashes reales en la sesión.
+     * Soporta el hashing CRC32C de Symfony 7.3+.
+     * * @return array
      */
     public function __serialize(): array
     {
@@ -168,17 +199,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $data;
     }
 
+    /**
+     * Elimina credenciales temporales sensibles tras la autenticación.
+     */
     #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
+        // @deprecated para ser eliminado en futuras versiones de Symfony.
     }
 
+    /**
+     * @return string|null Apodo público del usuario.
+     */
     public function getNickname(): ?string
     {
         return $this->nickname;
     }
 
+    /**
+     * @param string $nickname Nuevo apodo.
+     * @return static
+     */
     public function setNickname(string $nickname): static
     {
         $this->nickname = $nickname;
@@ -186,11 +227,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return array|null Preferencias de configuración del usuario.
+     */
     public function getPreferences(): ?array
     {
         return $this->preferences;
     }
 
+    /**
+     * @param array|null $preferences Mapa de preferencias.
+     * @return static
+     */
     public function setPreferences(?array $preferences): static
     {
         $this->preferences = $preferences;
@@ -198,11 +246,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return \DateTimeImmutable|null Fecha en la que se creó la cuenta.
+     */
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
+    /**
+     * @param \DateTimeImmutable $createdAt Fecha de creación.
+     * @return static
+     */
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -218,6 +273,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->emotions;
     }
 
+    /**
+     * Añade una emoción al catálogo del usuario.
+     * @param Emotion $emotion
+     * @return static
+     */
     public function addEmotion(Emotion $emotion): static
     {
         if (!$this->emotions->contains($emotion)) {
@@ -228,10 +288,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Elimina una emoción del catálogo.
+     * @param Emotion $emotion
+     * @return static
+     */
     public function removeEmotion(Emotion $emotion): static
     {
         if ($this->emotions->removeElement($emotion)) {
-            // set the owning side to null (unless already changed)
             if ($emotion->getUser() === $this) {
                 $emotion->setUser(null);
             }
@@ -248,6 +312,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->entries;
     }
 
+    /**
+     * Vincula una entrada de diario al usuario.
+     * @param Entry $entry
+     * @return static
+     */
     public function addEntry(Entry $entry): static
     {
         if (!$this->entries->contains($entry)) {
@@ -258,10 +327,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Desvincula una entrada de diario.
+     * @param Entry $entry
+     * @return static
+     */
     public function removeEntry(Entry $entry): static
     {
         if ($this->entries->removeElement($entry)) {
-            // set the owning side to null (unless already changed)
             if ($entry->getUser() === $this) {
                 $entry->setUser(null);
             }
@@ -278,6 +351,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->activities;
     }
 
+    /**
+     * Añade una actividad al catálogo del usuario.
+     * @param Activity $activity
+     * @return static
+     */
     public function addActivity(Activity $activity): static
     {
         if (!$this->activities->contains($activity)) {
@@ -288,10 +366,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Elimina una actividad del catálogo.
+     * @param Activity $activity
+     * @return static
+     */
     public function removeActivity(Activity $activity): static
     {
         if ($this->activities->removeElement($activity)) {
-            // set the owning side to null (unless already changed)
             if ($activity->getUser() === $this) {
                 $activity->setUser(null);
             }
@@ -308,6 +390,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->tags;
     }
 
+    /**
+     * Añade una etiqueta al catálogo del usuario.
+     * @param Tag $tag
+     * @return static
+     */
     public function addTag(Tag $tag): static
     {
         if (!$this->tags->contains($tag)) {
@@ -318,10 +405,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Elimina una etiqueta del catálogo.
+     * @param Tag $tag
+     * @return static
+     */
     public function removeTag(Tag $tag): static
     {
         if ($this->tags->removeElement($tag)) {
-            // set the owning side to null (unless already changed)
             if ($tag->getUser() === $this) {
                 $tag->setUser(null);
             }
@@ -338,6 +429,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->goals;
     }
 
+    /**
+     * Vincula un objetivo al usuario.
+     * @param Goal $goal
+     * @return static
+     */
     public function addGoal(Goal $goal): static
     {
         if (!$this->goals->contains($goal)) {
@@ -348,10 +444,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Desvincula un objetivo del usuario.
+     * @param Goal $goal
+     * @return static
+     */
     public function removeGoal(Goal $goal): static
     {
         if ($this->goals->removeElement($goal)) {
-            // set the owning side to null (unless already changed)
             if ($goal->getUser() === $this) {
                 $goal->setUser(null);
             }
