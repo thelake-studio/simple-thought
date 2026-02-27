@@ -13,134 +13,141 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AppFixtures extends Fixture
+/**
+ * Clase encargada de cargar datos de prueba (Fixtures) en la base de datos.
+ * Genera un usuario base con su catálogo completo de emociones, actividades,
+ * etiquetas, entradas de diario y diferentes escenarios de objetivos para entorno de desarrollo.
+ */
+final class AppFixtures extends Fixture
 {
-    private UserPasswordHasherInterface $hasher;
-
-    public function __construct(UserPasswordHasherInterface $hasher)
-    {
-        $this->hasher = $hasher;
+    /**
+     * Constructor para la inyección de dependencias.
+     *
+     * @param UserPasswordHasherInterface $userPasswordHasher Servicio para el hash de contraseñas.
+     */
+    public function __construct(
+        private readonly UserPasswordHasherInterface $userPasswordHasher
+    ) {
     }
 
+    /**
+     * Ejecuta la generación y persistencia de los datos ficticios.
+     *
+     * @param ObjectManager $manager Gestor de entidades de Doctrine.
+     * @return void
+     */
     public function load(ObjectManager $manager): void
     {
-        // Creamos una instancia de la entidad User
         $user = new User();
         $user->setEmail('alumno@daw.com');
         $user->setNickname('ProgramadorDAW');
-        $user->setCreatedAt(new \DateTimeImmutable()); // Fecha de creación actual
+        $user->setCreatedAt(new \DateTimeImmutable());
 
-        // Ciframos la contraseña '123456'
-        $password = $this->hasher->hashPassword($user, '123456');
-        $user->setPassword($password);
+        $hashedPassword = $this->userPasswordHasher->hashPassword($user, '123456');
+        $user->setPassword($hashedPassword);
 
-        // Le decimos a Doctrine que "prepare" este objeto para guardarlo
         $manager->persist($user);
 
-        // 2. Crear un catálogo de Emociones para este usuario
-        $emocionesDatos = [
+        $emotionsData = [
             ['Alegría', 9, '#FFD700', 'fa-smile'],
             ['Calma', 7, '#ADD8E6', 'fa-leaf'],
             ['Cansancio', 4, '#808080', 'fa-battery-quarter'],
             ['Tristeza', 2, '#4682B4', 'fa-frown'],
         ];
 
-        foreach ($emocionesDatos as [$nombre, $valor, $color, $icono]) {
+        $lastEmotion = null;
+        foreach ($emotionsData as [$name, $value, $color, $icon]) {
             $emotion = new Emotion();
-            $emotion->setName($nombre);
-            $emotion->setValue($valor); // Este valor (1-10) es para tus futuras gráficas
+            $emotion->setName($name);
+            $emotion->setValue($value);
             $emotion->setColor($color);
-            $emotion->setIcon($icono);
-
-            // ¡IMPORTANTE!: Vinculamos la emoción al usuario que creamos arriba
-            $emotion->setUser($user); //
+            $emotion->setIcon($icon);
+            $emotion->setUser($user);
 
             $manager->persist($emotion);
+            $lastEmotion = $emotion;
         }
 
-        // 3. Crear un catálogo de Actividades para este usuario
-        $actividadesDatos = [
+        $activitiesData = [
             ['Deporte', 'Salud', 'fa-running', '#FF4500'],
             ['Programar', 'Estudios', 'fa-code', '#1E90FF'],
             ['Lectura', 'Ocio', 'fa-book', '#8A2BE2'],
             ['Meditar', 'Salud', 'fa-spa', '#20B2AA'],
         ];
 
-        foreach ($actividadesDatos as [$nombre, $categoria, $icono, $color]) {
+        $lastActivity = null;
+        foreach ($activitiesData as [$name, $category, $icon, $color]) {
             $activity = new Activity();
-            $activity->setName($nombre);
-            $activity->setCategory($categoria);
-            $activity->setIcon($icono);
+            $activity->setName($name);
+            $activity->setCategory($category);
+            $activity->setIcon($icon);
             $activity->setColor($color);
-
-            // Vinculamos la actividad al usuario
             $activity->setUser($user);
 
             $manager->persist($activity);
+            $lastActivity = $activity;
         }
 
-        // 4. Crear un catálogo de Etiquetas (Tags) para este usuario
-        $tagsDatos = [
+        $tagsData = [
             ['Importante', '#FF0000'],
             ['Reflexión', '#4B0082'],
             ['Logro', '#32CD32'],
             ['Idea', '#FFFF00'],
         ];
 
-        foreach ($tagsDatos as [$nombre, $color]) {
+        $lastTag = null;
+        foreach ($tagsData as [$name, $color]) {
             $tag = new Tag();
-            $tag->setName($nombre);
+            $tag->setName($name);
             $tag->setColor($color);
-
-            // Cada etiqueta pertenece a tu usuario
             $tag->setUser($user);
 
             $manager->persist($tag);
+            $lastTag = $tag;
         }
 
-        // 5. Crear una Entrada de diario de prueba relacionada con todo lo anterior
-        $entrada = new Entry();
-        $entrada->setTitle('Mi primer día programando Simple Thought');
-        $entrada->setContent('Hoy he avanzado muchísimo en el TFG. He configurado las validaciones y las fixtures.');
-        $entrada->setDate(new \DateTime()); // Fecha de hoy
+        $entry = new Entry();
+        $entry->setTitle('Mi primer día programando Simple Thought');
+        $entry->setContent('Hoy he avanzado muchísimo en el TFG. He configurado las validaciones y las fixtures.');
+        $entry->setDate(new \DateTime());
 
-        // El snapshot debe coincidir con el valor de la emoción en ese momento
-        $entrada->setMoodValueSnapshot($emotion->getValue());
+        if ($lastEmotion !== null) {
+            $entry->setMoodValueSnapshot($lastEmotion->getValue());
+            $entry->setEmotion($lastEmotion);
+        }
 
-        // Relaciones ManyToOne: Un objeto para cada campo
-        $entrada->setUser($user);
-        $entrada->setEmotion($emotion); // Usará la última emoción del bucle anterior (Tristeza)
+        $entry->setUser($user);
 
-        // Relaciones ManyToMany: Podemos añadir varias
-        $entrada->addActivity($activity); // Añade la última actividad (Meditar)
-        $entrada->addTag($tag); // Añade el último tag (Idea)
+        if ($lastActivity !== null) {
+            $entry->addActivity($lastActivity);
+        }
 
-        $entrada->setCreatedAt(new \DateTimeImmutable());
+        if ($lastTag !== null) {
+            $entry->addTag($lastTag);
+        }
 
-        $manager->persist($entrada);
+        $entry->setCreatedAt(new \DateTimeImmutable());
+        $manager->persist($entry);
 
-        // --- ESCENARIO 1: RACHA ACTIVA (Leer 30 min) ---
-        // Tipo: Racha | Periodo: Diario | Estado: Llevamos 5 días seguidos
+        // Escenario 1: Objetivo de racha activa (5 días seguidos)
         $goalReading = new Goal();
         $goalReading->setName('Leer 30 minutos');
         $goalReading->setType(Goal::TYPE_STREAK);
         $goalReading->setPeriod(Goal::PERIOD_DAILY);
-        $goalReading->setTargetValue(1); // 1 vez al día
+        $goalReading->setTargetValue(1);
         $goalReading->setUser($user);
         $goalReading->setCreatedAt(new \DateTimeImmutable());
         $manager->persist($goalReading);
 
-        // Generamos logs para los últimos 5 días (incluido hoy)
         for ($i = 0; $i < 5; $i++) {
             $log = new GoalLog();
             $log->setGoal($goalReading);
             $log->setDate(new \DateTimeImmutable("- $i days"));
-            $log->setValue(1); // Cumplido
+            $log->setValue(1);
             $manager->persist($log);
         }
 
-        // --- ESCENARIO 2: RACHA ROTA (Sin Azúcar) ---
-        // Tipo: Racha | Periodo: Diario | Estado: Fallaste ayer (sin log ayer)
+        // Escenario 2: Objetivo de racha rota (Fallo en el día de ayer)
         $goalSugar = new Goal();
         $goalSugar->setName('Días sin azúcar');
         $goalSugar->setType(Goal::TYPE_STREAK);
@@ -149,7 +156,6 @@ class AppFixtures extends Fixture
         $goalSugar->setCreatedAt(new \DateTimeImmutable());
         $manager->persist($goalSugar);
 
-        // Generamos logs antiguos (hace 3, 4 y 5 días), pero NO ayer ni hoy
         for ($i = 3; $i <= 6; $i++) {
             $log = new GoalLog();
             $log->setGoal($goalSugar);
@@ -158,8 +164,7 @@ class AppFixtures extends Fixture
             $manager->persist($log);
         }
 
-        // --- ESCENARIO 3: SUMA SEMANAL (Pasos) ---
-        // Tipo: Suma | Periodo: Semanal | Meta: 20.000 | Estado: Llevamos ~12.000
+        // Escenario 3: Objetivo de suma (Progreso acumulativo parcial)
         $goalSteps = new Goal();
         $goalSteps->setName('Caminar 20k pasos');
         $goalSteps->setType(Goal::TYPE_SUM);
@@ -169,20 +174,18 @@ class AppFixtures extends Fixture
         $goalSteps->setCreatedAt(new \DateTimeImmutable());
         $manager->persist($goalSteps);
 
-        // Simulamos unos pasos esta semana
-        $logSteps1 = new GoalLog();
-        $logSteps1->setGoal($goalSteps);
-        $logSteps1->setDate(new \DateTimeImmutable('today'));
-        $logSteps1->setValue(5000);
-        $manager->persist($logSteps1);
+        $logStepsToday = new GoalLog();
+        $logStepsToday->setGoal($goalSteps);
+        $logStepsToday->setDate(new \DateTimeImmutable('today'));
+        $logStepsToday->setValue(5000);
+        $manager->persist($logStepsToday);
 
-        $logSteps2 = new GoalLog();
-        $logSteps2->setGoal($goalSteps);
-        $logSteps2->setDate(new \DateTimeImmutable('-1 day')); // Ayer
-        $logSteps2->setValue(7500);
-        $manager->persist($logSteps2);
+        $logStepsYesterday = new GoalLog();
+        $logStepsYesterday->setGoal($goalSteps);
+        $logStepsYesterday->setDate(new \DateTimeImmutable('-1 day'));
+        $logStepsYesterday->setValue(7500);
+        $manager->persist($logStepsYesterday);
 
-        // Guardamos los cambios físicamente en la base de datos
         $manager->flush();
     }
 }

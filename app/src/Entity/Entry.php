@@ -9,6 +9,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad central que representa una entrada en el diario emocional del usuario.
+ * Contiene la reflexión, la fecha, y sus relaciones con el estado de ánimo, actividades y etiquetas.
+ */
 #[ORM\Entity(repositoryClass: EntryRepository::class)]
 class Entry
 {
@@ -35,7 +39,6 @@ class Entry
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    //#[Assert\NotBlank]
     #[Assert\Range(
         min: 1,
         max: 10,
@@ -159,13 +162,19 @@ class Entry
     }
 
     /**
-     * @return Collection<int, Activity>
+     * Obtiene la colección de actividades vinculadas a esta entrada.
+     * * @return Collection<int, Activity>
      */
     public function getActivities(): Collection
     {
         return $this->activities;
     }
 
+    /**
+     * Añade una actividad a la entrada.
+     * * @param Activity $activity La actividad a vincular.
+     * @return static
+     */
     public function addActivity(Activity $activity): static
     {
         if (!$this->activities->contains($activity)) {
@@ -175,6 +184,11 @@ class Entry
         return $this;
     }
 
+    /**
+     * Elimina una actividad de la entrada.
+     * * @param Activity $activity La actividad a desvincular.
+     * @return static
+     */
     public function removeActivity(Activity $activity): static
     {
         $this->activities->removeElement($activity);
@@ -183,13 +197,19 @@ class Entry
     }
 
     /**
-     * @return Collection<int, Tag>
+     * Obtiene la colección de etiquetas vinculadas a esta entrada.
+     * * @return Collection<int, Tag>
      */
     public function getTags(): Collection
     {
         return $this->tags;
     }
 
+    /**
+     * Añade una etiqueta a la entrada.
+     * * @param Tag $tag La etiqueta a vincular.
+     * @return static
+     */
     public function addTag(Tag $tag): static
     {
         if (!$this->tags->contains($tag)) {
@@ -199,6 +219,11 @@ class Entry
         return $this;
     }
 
+    /**
+     * Elimina una etiqueta de la entrada.
+     * * @param Tag $tag La etiqueta a desvincular.
+     * @return static
+     */
     public function removeTag(Tag $tag): static
     {
         $this->tags->removeElement($tag);

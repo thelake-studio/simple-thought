@@ -1,11 +1,10 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    # Configuración de los algoritmos de hashing para las contraseñas
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    # Proveedor de usuarios que carga la entidad User desde la base de datos
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
         app_user_provider:
             entity:
                 class: App\Entity\User
@@ -13,7 +12,7 @@ security:
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
+            # Permite el acceso sin seguridad a las herramientas de desarrollo y assets
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
@@ -22,36 +21,24 @@ security:
             custom_authenticator: App\Security\AppCustomAuthenticator
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
 
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800
+                lifetime: 604800 # 1 semana en segundos
                 path: /
-                # by default, the feature is enabled by checking a checkbox in the
-                # login form, uncomment the following line to always enable it.
-                #always_remember_me: true
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
+    # Reglas de control de acceso a las rutas de la aplicación (la primera regla que coincide es la que manda)
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register, roles: PUBLIC_ACCESS }
-        - { path: ^/, roles: ROLE_USER, requires_channel: https}
+        - { path: ^/, roles: ROLE_USER, requires_channel: https }
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
+            # Reducción de los costes de hashing para acelerar la ejecución de los tests automáticos
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4 # Valor mínimo permitido por bcrypt
+                time_cost: 3 # Valor mínimo permitido por argon
+                memory_cost: 10 # Valor mínimo permitido por argon

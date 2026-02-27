@@ -9,6 +9,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad que representa una actividad personalizada dentro del catálogo de un usuario.
+ * Permite categorizar y asignar atributos visuales (icono, color) a las acciones diarias.
+ */
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 class Activity
 {
@@ -134,6 +138,8 @@ class Activity
     }
 
     /**
+     * Obtiene todas las entradas del diario asociadas a esta actividad.
+     *
      * @return Collection<int, Entry>
      */
     public function getEntries(): Collection
@@ -141,6 +147,12 @@ class Activity
         return $this->entries;
     }
 
+    /**
+     * Vincula una entrada del diario con esta actividad.
+     *
+     * @param Entry $entry La entrada a vincular.
+     * @return static
+     */
     public function addEntry(Entry $entry): static
     {
         if (!$this->entries->contains($entry)) {
@@ -151,6 +163,12 @@ class Activity
         return $this;
     }
 
+    /**
+     * Desvincula una entrada del diario de esta actividad.
+     *
+     * @param Entry $entry La entrada a desvincular.
+     * @return static
+     */
     public function removeEntry(Entry $entry): static
     {
         if ($this->entries->removeElement($entry)) {

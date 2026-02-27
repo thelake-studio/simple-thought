@@ -8,6 +8,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad que representa un objetivo o meta configurada por el usuario.
+ * Define si el objetivo es de tipo racha (STREAK) o acumulativo (SUM), y su periodo.
+ */
 #[ORM\Entity(repositoryClass: GoalRepository::class)]
 class Goal
 {
@@ -138,6 +142,8 @@ class Goal
     }
 
     /**
+     * Obtiene todos los registros de progreso (logs) asociados a este objetivo.
+     *
      * @return Collection<int, GoalLog>
      */
     public function getGoalLogs(): Collection
@@ -145,6 +151,12 @@ class Goal
         return $this->goalLogs;
     }
 
+    /**
+     * Añade un nuevo registro de progreso al objetivo.
+     *
+     * @param GoalLog $goalLog El registro a vincular.
+     * @return static
+     */
     public function addGoalLog(GoalLog $goalLog): static
     {
         if (!$this->goalLogs->contains($goalLog)) {
@@ -155,10 +167,15 @@ class Goal
         return $this;
     }
 
+    /**
+     * Elimina un registro de progreso del objetivo.
+     *
+     * @param GoalLog $goalLog El registro a desvincular.
+     * @return static
+     */
     public function removeGoalLog(GoalLog $goalLog): static
     {
         if ($this->goalLogs->removeElement($goalLog)) {
-            // set the owning side to null (unless already changed)
             if ($goalLog->getGoal() === $this) {
                 $goalLog->setGoal(null);
             }

@@ -6,6 +6,10 @@ use App\Repository\GoalLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad que representa un registro individual de progreso (Log) para un objetivo.
+ * Almacena el valor del avance realizado y la fecha exacta en la que se registró.
+ */
 #[ORM\Entity(repositoryClass: GoalLogRepository::class)]
 class GoalLog
 {
