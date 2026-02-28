@@ -1,75 +1,98 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Emoción: {{ emotion.name }}{% endblock %}
+{% block title %}Detalle: {{ emotion.name }} - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg border-0 overflow-hidden">
-                {# Cabecera con el color de la emoción #}
-                <div class="card-header text-white p-4" style="background-color: {{ emotion.color }};">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h1 class="h2 mb-0 fw-bold">
-                            {% if emotion.icon %}
-                                <i class="{{ emotion.icon }} me-2"></i>
-                            {% endif %}
+        <div class="col-12 col-lg-10 col-xl-8">
+
+            {# --- Cabecera y Navegación --- #}
+            <header class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <a href="{{ path('app_emotion_index') }}" class="text-decoration-none text-secondary small mb-3 d-inline-block" aria-label="Volver a mis emociones">
+                        <i class="fa-solid fa-arrow-left me-2"></i>Volver al listado
+                    </a>
+                    <h1 class="h3 fw-bold text-primary mb-0">
+                        <i class="fa-solid fa-eye me-2"></i>Detalle de Emoción
+                    </h1>
+                </div>
+                <div>
+                    <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-primary rounded-pill px-4 shadow-sm w-100" aria-label="Editar esta emoción">
+                        <i class="fa-solid fa-pen me-2"></i>Editar Emoción
+                    </a>
+                </div>
+            </header>
+
+            {# --- Tarjeta de Detalles --- #}
+            <div class="card border-0 shadow-sm rounded-4 mb-5">
+
+                {# Cabecera de Color Dinámico #}
+                <div class="card-header border-0 rounded-top-4 p-4 text-white" style="background-color: {{ emotion.color|default('#6c757d') }};">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                        <h2 class="h4 mb-0 fw-bold">
+                            {% if emotion.icon %} <i class="{{ emotion.icon }} me-2"></i> {% endif %}
                             {{ emotion.name }}
-                        </h1>
-                        <span class="badge bg-white text-dark fs-5 shadow-sm">
-                            Valor: {{ emotion.value }}/10
+                        </h2>
+                        <span class="badge bg-white bg-opacity-25 text-white border border-white rounded-pill px-3 py-2 shadow-sm" title="Intensidad de la emoción">
+                            Intensidad: {{ emotion.value }}/10
                         </span>
                     </div>
                 </div>
 
-                <div class="card-body p-4">
-                    <h5 class="text-muted mb-3">Detalles de la Emoción</h5>
+                <div class="card-body p-4 p-md-5">
+                    <h3 class="h6 text-secondary text-uppercase fw-bold mb-4 small" style="letter-spacing: 1px;">Información de la Emoción</h3>
 
-                    <dl class="row">
-                        <dt class="col-sm-4 text-muted">ID Interno</dt>
-                        <dd class="col-sm-8">{{ emotion.id }}</dd>
+                    <dl class="row g-4 mb-5">
+                        <dt class="col-sm-3 text-muted fw-semibold">ID Interno</dt>
+                        <dd class="col-sm-9 text-dark">{{ emotion.id }}</dd>
 
-                        <dt class="col-sm-4 text-muted">Nombre</dt>
-                        <dd class="col-sm-8 fw-bold">{{ emotion.name }}</dd>
-
-                        <dt class="col-sm-4 text-muted">Icono CSS</dt>
-                        <dd class="col-sm-8">
+                        <dt class="col-sm-3 text-muted fw-semibold">Configuración Visual</dt>
+                        <dd class="col-sm-9 d-flex align-items-center gap-4 flex-wrap">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="rounded-circle shadow-sm border" style="width: 24px; height: 24px; background-color: {{ emotion.color }};"></div>
+                                <span class="small text-muted fw-semibold">{{ emotion.color }}</span>
+                            </div>
                             {% if emotion.icon %}
-                                <code>{{ emotion.icon }}</code>
+                                <div class="d-flex align-items-center gap-2 border-start ps-4">
+                                    <i class="{{ emotion.icon }} text-secondary fs-5"></i>
+                                    <code class="small text-muted bg-light px-2 py-1 rounded">{{ emotion.icon }}</code>
+                                </div>
                             {% else %}
-                                <span class="text-muted fst-italic">Sin icono</span>
+                                <div class="d-flex align-items-center gap-2 border-start ps-4">
+                                    <span class="text-muted fst-italic small">Sin icono</span>
+                                </div>
                             {% endif %}
-                        </dd>
-
-                        <dt class="col-sm-4 text-muted">Código de Color</dt>
-                        <dd class="col-sm-8">
-                            <span class="badge border text-dark" style="background-color: {{ emotion.color }};">
-                                {{ emotion.color }}
-                            </span>
                         </dd>
                     </dl>
 
-                    {# Zona de estadísticas futuras (Placeholder) #}
-                    <div class="alert alert-light border mt-4">
-                        <i class="fas fa-chart-line text-primary"></i>
-                        <small class="text-muted">Aquí mostraremos cuántas veces has sentido esta emoción en el futuro módulo de estadísticas.</small>
-                    </div>
-                </div>
-
-                <div class="card-footer bg-light p-3 d-flex justify-content-between align-items-center">
-                    <a href="{{ path('app_emotion_index') }}" class="btn btn-outline-secondary">
-                        <i class="fas fa-arrow-left"></i> Volver al listado
-                    </a>
-
-                    <div>
-                        <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-primary me-2">
-                            <i class="fas fa-edit"></i> Editar
-                        </a>
-                        {# Aquí usamos el partial de borrado #}
-                        {{ include('emotion/_delete_form.html.twig') }}
+                    {# --- Placeholder para Estadísticas (Alerta UI Kit) --- #}
+                    <div class="alert alert-info border-0 shadow-sm rounded-3 d-flex align-items-center mb-0" role="alert">
+                        <i class="fa-solid fa-chart-line fs-4 me-3"></i>
+                        <div>
+                            <strong class="d-block mb-1">Estadísticas (Próximamente)</strong>
+                            <span class="small">Aquí mostraremos cuántas veces has sentido esta emoción en el futuro módulo de estadísticas.</span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {# --- Zona de Peligro (Eliminar) --- #}
+            <section class="mt-5 pt-4 border-top">
+                <h2 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Zona de Peligro</h2>
+                <div class="card border-0 bg-danger bg-opacity-10 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="h6 fw-bold text-danger mb-1">Borrar esta emoción</h3>
+                            <p class="text-danger small mb-0 opacity-75">Una vez eliminada, no podrás recuperar sus datos ni su histórico.</p>
+                        </div>
+                        <div style="min-width: 200px;">
+                            {{ include('emotion/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </div>
 </div>
