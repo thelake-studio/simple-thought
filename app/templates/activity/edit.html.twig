@@ -1,19 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Actividad{% endblock %}
+{% block title %}Editar Actividad - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <h1 class="h3 mb-4 text-success"><i class="fas fa-edit"></i> Editar: {{ activity.name }}</h1>
+        <div class="col-12 col-lg-10 col-xl-8">
 
-            {% include 'activity/_form.html.twig' with {'button_label': 'Actualizar'} %}
+            {# --- Cabecera --- #}
+            <header class="mb-4">
+                <a href="{{ path('app_activity_index') }}" class="text-decoration-none text-secondary small mb-3 d-inline-block" aria-label="Volver a mis actividades">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Volver al listado
+                </a>
+                <h1 class="h3 fw-bold text-primary mb-1">
+                    <i class="fa-solid fa-pen me-2"></i>Editar Actividad
+                </h1>
+                <p class="text-muted small mb-0">Modifica los detalles de "{{ activity.name }}".</p>
+            </header>
 
-            <div class="mt-3 text-end">
-                {# Comentado hasta que creemos el delete form #}
-                {{ include('activity/_delete_form.html.twig') }}
-            </div>
+            {# --- Formulario Principal --- #}
+            {% include 'activity/_form.html.twig' with {'button_label': 'Guardar Cambios'} %}
+
+            {# --- Zona de Peligro (Eliminar) --- #}
+            <section class="mt-5 pt-4 border-top">
+                <h2 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Zona de Peligro</h2>
+                <div class="card border-0 bg-danger bg-opacity-10 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="h6 fw-bold text-danger mb-1">Borrar esta actividad</h3>
+                            <p class="text-danger small mb-0 opacity-75">Una vez eliminada, no podrás recuperar sus datos.</p>
+                        </div>
+                        <div style="min-width: 200px;">
+                            {{ include('activity/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </div>
 </div>
