@@ -3,67 +3,77 @@
 {% block title %}Registro - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-5">
-                    <div class="text-center mb-4">
-                        <h1 class="h3 mb-3 font-weight-normal">
-                            <i class="fa-solid fa-seedling text-success"></i> Empieza tu viaje
-                        </h1>
-                        <p class="text-muted">Crea tu cuenta en Simple Thought</p>
-                    </div>
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
 
-                    {# Si hay errores globales del formulario, aparecerán aquí #}
-                    {{ form_errors(registrationForm) }}
+            {# --- Tarjeta de Registro --- #}
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-md-5">
+
+                    {# --- Cabecera --- #}
+                    <header class="text-center mb-5">
+                        <h1 class="h3 fw-bold text-primary mb-2">
+                            <i class="fa-solid fa-seedling me-2 text-success"></i>Empieza tu viaje
+                        </h1>
+                        <p class="text-muted small mb-0">Crea tu cuenta en Simple Thought</p>
+                    </header>
+
+                    {# --- Errores Globales --- #}
+                    {% if not registrationForm.vars.valid %}
+                        <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                            {{ form_errors(registrationForm) }}
+                        </div>
+                    {% endif %}
 
                     {{ form_start(registrationForm) }}
 
-                        {# Campo: Nickname #}
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.nickname, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(registrationForm.nickname, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {# --- Campo: Nickname --- #}
+                        <div class="mb-4">
+                            {{ form_label(registrationForm.nickname, 'Tu Nombre o Nickname', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                            {{ form_widget(registrationForm.nickname, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Álex'}}) }}
                             <div class="text-danger small mt-1">{{ form_errors(registrationForm.nickname) }}</div>
                         </div>
 
-                        {# Campo: Email #}
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                        {# --- Campo: Email --- #}
+                        <div class="mb-4">
+                            {{ form_label(registrationForm.email, 'Correo Electrónico', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                            {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'tucorreo@ejemplo.com'}}) }}
                             <div class="text-danger small mt-1">{{ form_errors(registrationForm.email) }}</div>
                         </div>
 
-                        {# Campo: Contraseña #}
+                        {# --- Campo: Contraseña --- #}
                         <div class="mb-4">
-                            {{ form_label(registrationForm.plainPassword, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control form-control-lg'}}) }}
+                            {{ form_label(registrationForm.plainPassword, 'Contraseña', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                            {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Mínimo 6 caracteres'}}) }}
                             <div class="text-danger small mt-1">{{ form_errors(registrationForm.plainPassword) }}</div>
                         </div>
 
-                        {# Checkbox: Términos #}
+                        {# --- Checkbox: Términos --- #}
                         <div class="mb-4 form-check">
-                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                            {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'form-check-label text-muted'}}) }}
+                            {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'form-check-input shadow-sm'}}) }}
+                            {{ form_label(registrationForm.agreeTerms, 'Acepto los términos y condiciones', {'label_attr': {'class': 'form-check-label text-muted small'}}) }}
                             <div class="text-danger small mt-1">{{ form_errors(registrationForm.agreeTerms) }}</div>
                         </div>
 
-                        {# Botón de Submit #}
-                        <button class="btn btn-primary btn-lg w-100 py-2 mb-3 shadow-sm" type="submit">
-                            <i class="fa-solid fa-user-plus me-2"></i> Registrarme
+                        {# --- Botón Principal --- #}
+                        <button class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm mb-4" type="submit">
+                            <i class="fa-solid fa-user-plus me-2"></i>Registrarme
                         </button>
 
-                        {# Botón simétrico para ir al Login #}
-                        <div class="text-center mt-4 pt-3 border-top">
-                            <p class="text-muted small mb-2">¿Ya formas parte de Simple Thought?</p>
-                            <a href="{{ path('app_login') }}" class="btn btn-outline-secondary w-100">
-                                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Iniciar sesión
-                            </a>
-                        </div>
-
                     {{ form_end(registrationForm) }}
+
+                    {# --- Navegación Secundaria (Login) --- #}
+                    <div class="text-center pt-4 border-top">
+                        <p class="text-muted small mb-3">¿Ya formas parte de Simple Thought?</p>
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-secondary w-100 rounded-pill" aria-label="Ir a la página de iniciar sesión">
+                            <i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Iniciar sesión
+                        </a>
+                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 </div>
