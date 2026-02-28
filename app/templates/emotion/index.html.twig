@@ -1,66 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mis Emociones{% endblock %}
+{% block title %}Mis Emociones - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 text-primary"><i class="fas fa-heart-pulse"></i> Mis Emociones</h1>
-        <a href="{{ path('app_emotion_new') }}" class="btn btn-primary shadow-sm">
-            <i class="fas fa-plus"></i> Nueva Emoción
-        </a>
-    </div>
+<div class="container-fluid py-4">
 
-    {% if emotions is empty %}
-        <div class="alert alert-info text-center shadow-sm">
-            <i class="fas fa-info-circle fa-2x mb-3 d-block"></i>
-            <p class="mb-0">Aún no has registrado ninguna emoción.</p>
-            <p>¡Empieza definiendo cómo te sientes habitualmente!</p>
-            <a href="{{ path('app_emotion_new') }}" class="btn btn-sm btn-outline-info mt-2">Crear mi primera emoción</a>
+    {# --- Cabecera de la Vista --- #}
+    <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h1 class="h3 fw-bold text-primary mb-1">
+                <i class="fa-solid fa-heart-pulse me-2"></i>Mis Emociones
+            </h1>
+            <p class="text-muted small mb-0">Define cómo te sientes para registrarlo en tu diario.</p>
         </div>
-    {% else %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for emotion in emotions %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 hover-effect">
-                        {# Cabecera con el color de la emoción #}
-                        <div class="card-header border-0 d-flex justify-content-between align-items-center text-white"
-                             style="background-color: {{ emotion.color|default('#6c757d') }};">
-                            <h5 class="card-title mb-0">
-                                {% if emotion.icon %}
-                                    <i class="{{ emotion.icon }}"></i>
-                                {% endif %}
-                                {{ emotion.name }}
-                            </h5>
-                            <span class="badge bg-light text-dark rounded-pill" title="Intensidad">
-                                {{ emotion.value }}/10
-                            </span>
-                        </div>
+        <a href="{{ path('app_emotion_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm" aria-label="Crear una nueva emoción">
+            <i class="fa-solid fa-plus me-2"></i>Nueva Emoción
+        </a>
+    </header>
 
-                        <div class="card-body">
-                            <p class="card-text text-muted small">
-                                Identificador visual y configuración para tus registros diarios.
-                            </p>
-                        </div>
+    {# --- Contenido Principal --- #}
+    <section>
+        {% if emotions is empty %}
+            {# --- Estado Vacío (Empty State) --- #}
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                <div class="card-body">
+                    <i class="fa-solid fa-face-smile fa-3x text-secondary mb-3"></i>
+                    <h2 class="h5 fw-bold text-dark">¡Expresa lo que sientes!</h2>
+                    <p class="text-muted mb-4">Aún no has registrado ninguna emoción.<br>Empieza definiendo tus estados de ánimo habituales (Feliz, Triste, Ansioso...).</p>
+                    <a href="{{ path('app_emotion_new') }}" class="btn btn-primary rounded-pill px-4" aria-label="Crear mi primera emoción">
+                        Crear mi primera emoción
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            {# --- Cuadrícula de Emociones --- #}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for emotion in emotions %}
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm rounded-4">
 
-                        <div class="card-footer bg-white border-top-0 text-end">
-                            <a href="{{ path('app_emotion_show', {'id': emotion.id}) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            {# Cabecera de Color Dinámico #}
+                            <div class="card-header border-0 rounded-top-4 py-3 text-white" style="background-color: {{ emotion.color|default('#6c757d') }};">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="h6 fw-bold mb-0 text-truncate">
+                                        {% if emotion.icon %}
+                                            <i class="{{ emotion.icon }} me-2"></i>
+                                        {% endif %}
+                                        {{ emotion.name }}
+                                    </h3>
+                                    <span class="badge bg-white bg-opacity-25 text-white border border-white rounded-pill px-3 shadow-sm" title="Intensidad de la emoción">
+                                        {{ emotion.value }}/10
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <p class="card-text text-muted small mb-0">
+                                    Identificador visual y configuración para tus registros diarios.
+                                </p>
+                            </div>
+
+                            <div class="card-footer bg-white border-0 rounded-bottom-4 text-end pb-3 pe-3 pt-0">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('app_emotion_show', {'id': emotion.id}) }}" class="btn btn-sm btn-light text-primary rounded-circle" aria-label="Ver detalle de {{ emotion.name }}" title="Ver detalle">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_emotion_edit', {'id': emotion.id}) }}" class="btn btn-sm btn-light text-secondary rounded-circle" aria-label="Editar {{ emotion.name }}" title="Editar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
 </div>
-
-<style>
-    /* Un pequeño toque extra de CSS para esta vista */
-    .hover-effect { transition: transform 0.2s; }
-    .hover-effect:hover { transform: translateY(-5px); }
-</style>
 {% endblock %}
