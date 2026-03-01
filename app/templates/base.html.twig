@@ -30,9 +30,8 @@
         <div class="container-fluid p-0">
             <div class="row g-0 flex-nowrap min-vh-100">
 
-                {# --- Barra de Navegación Lateral (Offcanvas en móvil, Sidebar en PC) --- #}
-                {# CORRECCIÓN: Hemos eliminado el style="z-index: 1040;" para dejar que Bootstrap maneje las capas y el fondo oscuro se quede detrás #}
-                <aside class="col-md-3 col-xl-2 offcanvas-md offcanvas-start bg-white shadow-sm d-flex flex-column" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                {# --- Barra de Navegación Lateral (Fija en PC con sticky-md-top vh-100) --- #}
+                <aside class="col-md-3 col-xl-2 offcanvas-md offcanvas-start bg-white shadow-sm d-flex flex-column sticky-md-top vh-100" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
 
                     {# Cabecera del Offcanvas (solo visible en móvil) #}
                     <div class="offcanvas-header border-bottom d-md-none">
@@ -43,7 +42,7 @@
                     </div>
 
                     {# Cuerpo de la navegación #}
-                    <div class="offcanvas-body d-flex flex-column justify-content-between p-4 h-100">
+                    <div class="offcanvas-body d-flex flex-column justify-content-between p-4 h-100 overflow-auto">
                         <div>
                             {# Logo para PC (solo visible en pantallas medianas o superiores) #}
                             <a href="{{ path('app_home') }}" class="d-none d-md-flex align-items-center mb-5 text-decoration-none text-primary" aria-label="Ir a la página principal">
@@ -58,8 +57,21 @@
                                             <i class="fa-solid fa-house me-2"></i>Inicio
                                         </a>
                                     </li>
+                                    {# Acceso al Diario #}
                                     <li class="nav-item">
-                                        <a href="{{ path('app_profile_index') }}" class="nav-link fw-semibold rounded-3 {% if app.request.attributes.get('_route') == 'app_profile_index' %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi perfil">
+                                        <a href="{{ path('app_entry_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_entry' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi diario">
+                                            <i class="fa-solid fa-book-open me-2"></i>Mi Diario
+                                        </a>
+                                    </li>
+                                    {# Acceso a Objetivos #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_goal_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_goal' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mis objetivos">
+                                            <i class="fa-solid fa-bullseye me-2"></i>Mis Objetivos
+                                        </a>
+                                    </li>
+                                    {# Acceso al Perfil #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_profile_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_profile' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi perfil">
                                             <i class="fa-solid fa-user-circle me-2"></i>Mi Perfil
                                         </a>
                                     </li>
@@ -82,7 +94,7 @@
                 </aside>
 
                 {# --- Contenido Principal --- #}
-                <main class="col p-4 p-md-5 overflow-auto">
+                <main class="col p-4 p-md-5">
 
                     {# --- Sistema Global de Mensajes Flash (Feedback UI Kit) --- #}
                     <div aria-live="polite" aria-atomic="true" class="mb-4">
