@@ -3,93 +3,140 @@
 {% block title %}Inicio - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container py-4">
-    {# Cabecera de Bienvenida #}
-    <div class="row mb-5">
-        <div class="col-12">
-            <h1 class="display-5 fw-bold text-dark">Hola, {{ app.user.nickname }} 👋</h1>
-            <p class="lead text-muted">Aquí tienes el control de tu bienestar emocional.</p>
-            <hr class="my-4 opacity-25">
-        </div>
-    </div>
+<div class="container-fluid py-2">
 
-    {# SECCIÓN 1: ACCIONES PRINCIPALES (Diario) #}
-    <h5 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-book-open me-2"></i> Mi Diario</h5>
-    <div class="row g-4 mb-5">
-        {# Tarjeta: Nueva Entrada #}
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100 hover-card">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3 text-primary">
-                        <i class="fas fa-pen-fancy fa-2x"></i>
+    {# --- Cabecera de Bienvenida --- #}
+    <header class="mb-5">
+        <h1 class="display-5 fw-bold text-primary">Hola, {{ app.user.nickname }} 👋</h1>
+        <p class="lead text-muted mb-0">Aquí tienes el control de tu bienestar emocional.</p>
+    </header>
+
+    {# --- SECCIÓN 1: ACCIONES PRINCIPALES (Diario) --- #}
+    <section class="mb-5">
+        <h2 class="h5 border-bottom pb-2 mb-4 text-secondary"><i class="fa-solid fa-book-open me-2"></i> Mi Diario</h2>
+
+        <div class="row g-4">
+            {# Tarjeta: Nueva Entrada #}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-4 text-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fa-solid fa-pen-fancy fs-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="h5 fw-bold mb-1">Escribir Entrada de Hoy</h3>
+                            <p class="text-muted small mb-3">Registra cómo te sientes y qué has hecho.</p>
+                            <a href="{{ path('app_entry_new') }}" class="btn btn-primary rounded-pill px-4 stretched-link" aria-label="Escribir una nueva entrada en el diario">Empezar ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta: Ver Historial #}
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle me-4 text-success d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                            <i class="fa-solid fa-clock-rotate-left fs-3"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="h5 fw-bold mb-1">Ver mi Historial</h3>
+                            <p class="text-muted small mb-3">Revisa tus entradas anteriores y reflexiona.</p>
+                            <a href="{{ path('app_entry_index') }}" class="btn btn-outline-success rounded-pill px-4 stretched-link" aria-label="Ver el historial completo del diario">Abrir Timeline</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# --- SECCIÓN 2: OBJETIVOS Y HÁBITOS (Sección Destacada) --- #}
+    <section class="mb-5">
+        <h2 class="h5 border-bottom pb-2 mb-4 text-secondary"><i class="fa-solid fa-bullseye me-2"></i> Mis Metas</h2>
+
+        <div class="card border-0 shadow-sm rounded-4 position-relative" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+            <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+                <div class="d-flex align-items-center gap-4 text-center text-md-start w-100">
+                    <div class="bg-white p-3 rounded-circle shadow-sm text-warning d-flex align-items-center justify-content-center flex-shrink-0 mx-auto mx-md-0" style="width: 80px; height: 80px;">
+                        <i class="fa-solid fa-fire fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="card-title fw-bold mb-1">Escribir Entrada de Hoy</h5>
-                        <p class="card-text text-muted small mb-2">Registra cómo te sientes y qué has hecho.</p>
-                        <a href="{{ path('app_entry_new') }}" class="btn btn-sm btn-primary stretched-link">Empezar ahora</a>
+                        <h3 class="h4 fw-bold text-dark mb-1">Objetivos y Rachas</h3>
+                        <p class="text-muted mb-0">Mide tu constancia, acumula logros y no rompas la cadena diaria.</p>
                     </div>
+                </div>
+                <div class="w-100 w-md-auto text-center mt-3 mt-md-0 position-relative z-3">
+                    <a href="{{ path('app_goal_index') }}" class="btn btn-warning text-dark rounded-pill px-5 py-3 shadow-sm fw-bold w-100 text-nowrap stretched-link" aria-label="Ir al panel de objetivos">
+                        <i class="fa-solid fa-bullseye me-2"></i>Ver panel de Objetivos
+                    </a>
                 </div>
             </div>
         </div>
+    </section>
 
-        {# Tarjeta: Ver Historial #}
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100 hover-card">
-                <div class="card-body p-4 d-flex align-items-center">
-                    <div class="bg-success bg-opacity-10 p-3 rounded-circle me-3 text-success">
-                        <i class="fas fa-history fa-2x"></i>
+    {# --- SECCIÓN 3: ANALÍTICAS Y ESTADÍSTICAS (Nuevo Banner) --- #}
+    <section class="mb-5">
+        <h2 class="h5 border-bottom pb-2 mb-4 text-secondary"><i class="fa-solid fa-chart-line me-2"></i> Mi Evolución</h2>
+
+        <div class="card border-0 shadow-sm rounded-4 position-relative" style="background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%);">
+            <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+                <div class="d-flex align-items-center gap-4 text-center text-md-start w-100">
+                    <div class="bg-white p-3 rounded-circle shadow-sm text-info d-flex align-items-center justify-content-center flex-shrink-0 mx-auto mx-md-0" style="width: 80px; height: 80px;">
+                        <i class="fa-solid fa-chart-pie fa-2x"></i>
                     </div>
                     <div>
-                        <h5 class="card-title fw-bold mb-1">Ver mi Historial</h5>
-                        <p class="card-text text-muted small mb-2">Revisa tus entradas anteriores y reflexiona.</p>
-                        <a href="{{ path('app_entry_index') }}" class="btn btn-sm btn-outline-success stretched-link">Abrir Timeline</a>
+                        <h3 class="h4 fw-bold text-dark mb-1">Analíticas y Estadísticas</h3>
+                        <p class="text-muted mb-0">Descubre patrones, visualiza tu evolución emocional y repasa tu año en píxeles.</p>
+                    </div>
+                </div>
+                <div class="w-100 w-md-auto text-center mt-3 mt-md-0 position-relative z-3">
+                    <a href="{{ path('app_stats_index') }}" class="btn btn-info text-white rounded-pill px-5 py-3 shadow-sm fw-bold w-100 text-nowrap stretched-link" aria-label="Ir al panel de estadísticas">
+                        <i class="fa-solid fa-magnifying-glass-chart me-2"></i>Ver Analíticas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# --- SECCIÓN 4: GESTIÓN (Catálogos) --- #}
+    <section>
+        <h2 class="h5 border-bottom pb-2 mb-4 text-secondary"><i class="fa-solid fa-sliders me-2"></i> Configuración Personal</h2>
+
+        <div class="row g-4 row-cols-1 row-cols-md-3">
+            {# Tarjeta: Emociones #}
+            <div class="col">
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center py-4">
+                    <div class="card-body">
+                        <i class="fa-solid fa-face-smile fa-3x text-warning mb-3"></i>
+                        <h3 class="h6 fw-bold mb-3">Emociones</h3>
+                        <a href="{{ path('app_emotion_index') }}" class="btn btn-light text-primary rounded-pill px-4 stretched-link" aria-label="Gestionar catálogo de emociones">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta: Actividades #}
+            <div class="col">
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center py-4">
+                    <div class="card-body">
+                        <i class="fa-solid fa-person-running fa-3x text-info mb-3"></i>
+                        <h3 class="h6 fw-bold mb-3">Actividades</h3>
+                        <a href="{{ path('app_activity_index') }}" class="btn btn-light text-primary rounded-pill px-4 stretched-link" aria-label="Gestionar catálogo de actividades">Gestionar</a>
+                    </div>
+                </div>
+            </div>
+
+            {# Tarjeta: Etiquetas #}
+            <div class="col">
+                <div class="card border-0 shadow-sm rounded-4 h-100 text-center py-4">
+                    <div class="card-body">
+                        <i class="fa-solid fa-tags fa-3x text-secondary mb-3"></i>
+                        <h3 class="h6 fw-bold mb-3">Etiquetas</h3>
+                        <a href="{{ path('app_tag_index') }}" class="btn btn-light text-primary rounded-pill px-4 stretched-link" aria-label="Gestionar catálogo de etiquetas">Gestionar</a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    {# SECCIÓN 2: GESTIÓN (Catálogos) #}
-    <h5 class="text-uppercase text-muted small fw-bold mb-3"><i class="fas fa-cogs me-2"></i> Configuración Personal</h5>
-    <div class="row g-4 row-cols-1 row-cols-md-3">
-
-        {# Emociones #}
-        <div class="col">
-            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
-                <div class="card-body">
-                    <i class="fas fa-smile-beam fa-3x text-warning mb-3"></i>
-                    <h6 class="card-title fw-bold">Emociones</h6>
-                    <a href="{{ path('app_emotion_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
-                </div>
-            </div>
-        </div>
-
-        {# Actividades #}
-        <div class="col">
-            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
-                <div class="card-body">
-                    <i class="fas fa-running fa-3x text-info mb-3"></i>
-                    <h6 class="card-title fw-bold">Actividades</h6>
-                    <a href="{{ path('app_activity_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
-                </div>
-            </div>
-        </div>
-
-        {# Etiquetas #}
-        <div class="col">
-            <div class="card border-0 shadow-sm h-100 text-center py-3 hover-card">
-                <div class="card-body">
-                    <i class="fas fa-tags fa-3x text-secondary mb-3"></i>
-                    <h6 class="card-title fw-bold">Etiquetas</h6>
-                    <a href="{{ path('app_tag_index') }}" class="btn btn-link text-decoration-none stretched-link p-0">Gestionar</a>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
-
-<style>
-    .hover-card { transition: transform 0.2s; }
-    .hover-card:hover { transform: translateY(-5px); }
-</style>
 {% endblock %}

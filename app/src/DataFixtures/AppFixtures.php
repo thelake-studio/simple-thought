@@ -13,176 +13,196 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AppFixtures extends Fixture
+final class AppFixtures extends Fixture
 {
-    private UserPasswordHasherInterface $hasher;
-
-    public function __construct(UserPasswordHasherInterface $hasher)
-    {
-        $this->hasher = $hasher;
+    public function __construct(
+        private readonly UserPasswordHasherInterface $userPasswordHasher
+    ) {
     }
 
     public function load(ObjectManager $manager): void
     {
-        // Creamos una instancia de la entidad User
+        // --- 1. CREACIÓN DEL USUARIO ---
         $user = new User();
         $user->setEmail('alumno@daw.com');
-        $user->setNickname('ProgramadorDAW');
-        $user->setCreatedAt(new \DateTimeImmutable()); // Fecha de creación actual
+        $user->setNickname('José Luis');
+        $user->setCreatedAt(new \DateTimeImmutable('-3 months'));
 
-        // Ciframos la contraseña '123456'
-        $password = $this->hasher->hashPassword($user, '123456');
-        $user->setPassword($password);
-
-        // Le decimos a Doctrine que "prepare" este objeto para guardarlo
+        $hashedPassword = $this->userPasswordHasher->hashPassword($user, '123456');
+        $user->setPassword($hashedPassword);
         $manager->persist($user);
 
-        // 2. Crear un catálogo de Emociones para este usuario
-        $emocionesDatos = [
-            ['Alegría', 9, '#FFD700', 'fa-smile'],
-            ['Calma', 7, '#ADD8E6', 'fa-leaf'],
-            ['Cansancio', 4, '#808080', 'fa-battery-quarter'],
-            ['Tristeza', 2, '#4682B4', 'fa-frown'],
+        // --- 2. CATÁLOGO DE EMOCIONES ---
+        $emotionsData = [
+            ['Euforia', 10, '#198754', 'fa-solid fa-face-grin-stars'],
+            ['Alegría', 8, '#20c997', 'fa-solid fa-face-smile'],
+            ['Calma', 6, '#0dcaf0', 'fa-solid fa-face-smile-beam'],
+            ['Cansancio', 4, '#ffc107', 'fa-solid fa-face-meh'],
+            ['Ansiedad', 3, '#fd7e14', 'fa-solid fa-face-grimace'],
+            ['Tristeza', 2, '#dc3545', 'fa-solid fa-face-frown'],
         ];
 
-        foreach ($emocionesDatos as [$nombre, $valor, $color, $icono]) {
+        $emotions = [];
+        foreach ($emotionsData as [$name, $value, $color, $icon]) {
             $emotion = new Emotion();
-            $emotion->setName($nombre);
-            $emotion->setValue($valor); // Este valor (1-10) es para tus futuras gráficas
-            $emotion->setColor($color);
-            $emotion->setIcon($icono);
-
-            // ¡IMPORTANTE!: Vinculamos la emoción al usuario que creamos arriba
-            $emotion->setUser($user); //
-
+            $emotion->setName($name)->setValue($value)->setColor($color)->setIcon($icon)->setUser($user);
             $manager->persist($emotion);
+            $emotions[] = $emotion;
         }
 
-        // 3. Crear un catálogo de Actividades para este usuario
-        $actividadesDatos = [
-            ['Deporte', 'Salud', 'fa-running', '#FF4500'],
-            ['Programar', 'Estudios', 'fa-code', '#1E90FF'],
-            ['Lectura', 'Ocio', 'fa-book', '#8A2BE2'],
-            ['Meditar', 'Salud', 'fa-spa', '#20B2AA'],
+        // --- 3. CATÁLOGO DE ACTIVIDADES ---
+        $activitiesData = [
+            ['Gimnasio', 'Salud', 'fa-solid fa-dumbbell', '#FF4500'],
+            ['Programar TFG', 'Estudios', 'fa-solid fa-laptop-code', '#0d6efd'],
+            ['Lectura', 'Ocio', 'fa-solid fa-book-open', '#6f42c1'],
+            ['Meditar', 'Salud', 'fa-solid fa-spa', '#20c997'],
+            ['Amigos', 'Social', 'fa-solid fa-user-group', '#fd7e14'],
+            ['Videojuegos', 'Ocio', 'fa-solid fa-gamepad', '#dc3545'],
         ];
 
-        foreach ($actividadesDatos as [$nombre, $categoria, $icono, $color]) {
+        $activities = [];
+        foreach ($activitiesData as [$name, $category, $icon, $color]) {
             $activity = new Activity();
-            $activity->setName($nombre);
-            $activity->setCategory($categoria);
-            $activity->setIcon($icono);
-            $activity->setColor($color);
-
-            // Vinculamos la actividad al usuario
-            $activity->setUser($user);
-
+            $activity->setName($name)->setCategory($category)->setIcon($icon)->setColor($color)->setUser($user);
             $manager->persist($activity);
+            $activities[] = $activity;
         }
 
-        // 4. Crear un catálogo de Etiquetas (Tags) para este usuario
-        $tagsDatos = [
-            ['Importante', '#FF0000'],
-            ['Reflexión', '#4B0082'],
-            ['Logro', '#32CD32'],
-            ['Idea', '#FFFF00'],
+        // --- 4. CATÁLOGO DE ETIQUETAS ---
+        $tagsData = [
+            ['Productivo', '#198754'],
+            ['Relajado', '#0dcaf0'],
+            ['Estresante', '#dc3545'],
+            ['Inspiración', '#ffc107'],
+            ['Familia', '#d63384'],
         ];
 
-        foreach ($tagsDatos as [$nombre, $color]) {
+        $tags = [];
+        foreach ($tagsData as [$name, $color]) {
             $tag = new Tag();
-            $tag->setName($nombre);
-            $tag->setColor($color);
-
-            // Cada etiqueta pertenece a tu usuario
-            $tag->setUser($user);
-
+            $tag->setName($name)->setColor($color)->setUser($user);
             $manager->persist($tag);
+            $tags[] = $tag;
         }
 
-        // 5. Crear una Entrada de diario de prueba relacionada con todo lo anterior
-        $entrada = new Entry();
-        $entrada->setTitle('Mi primer día programando Simple Thought');
-        $entrada->setContent('Hoy he avanzado muchísimo en el TFG. He configurado las validaciones y las fixtures.');
-        $entrada->setDate(new \DateTime()); // Fecha de hoy
+        // --- 5. HISTORIAL DE DIARIO (60 Días para llenar gráficas) ---
+        $entryTitles = [
+            'Un día bastante normal', 'Avanzando a tope con el proyecto',
+            'Hoy necesitaba un descanso', 'Día increíble con amigos',
+            'Mucho estrés acumulado', 'Pequeños logros', 'Reflexiones de domingo'
+        ];
 
-        // El snapshot debe coincidir con el valor de la emoción en ese momento
-        $entrada->setMoodValueSnapshot($emotion->getValue());
+        for ($i = 60; $i >= 0; $i--) {
+            $date = new \DateTimeImmutable("- $i days");
 
-        // Relaciones ManyToOne: Un objeto para cada campo
-        $entrada->setUser($user);
-        $entrada->setEmotion($emotion); // Usará la última emoción del bucle anterior (Tristeza)
+            // Elegir emoción (sesgada hacia valores positivos)
+            $weightedIndices = [0, 0, 1, 1, 1, 2, 2, 3, 4, 5];
+            $randomIndex = $weightedIndices[array_rand($weightedIndices)];
+            $randomEmotion = $emotions[$randomIndex];
 
-        // Relaciones ManyToMany: Podemos añadir varias
-        $entrada->addActivity($activity); // Añade la última actividad (Meditar)
-        $entrada->addTag($tag); // Añade el último tag (Idea)
+            $entry = new Entry();
+            $entry->setTitle($entryTitles[array_rand($entryTitles)]);
+            $entry->setContent("Querido diario, hoy es " . $date->format('d/m/Y') . ". " .
+                "El día ha estado marcado por la emoción de " . $randomEmotion->getName() . ". " .
+                "Sigo trabajando en mantener mis hábitos, aunque a veces cuesta. ¡Mañana más!");
+            $entry->setDate(\DateTime::createFromImmutable($date));
+            $entry->setMoodValueSnapshot($randomEmotion->getValue());
+            $entry->setEmotion($randomEmotion);
+            $entry->setUser($user);
+            $entry->setCreatedAt($date->setTime(20, rand(0, 59))); // Creado por la noche
 
-        $entrada->setCreatedAt(new \DateTimeImmutable());
+            // Añadir de 1 a 3 actividades aleatorias
+            $randomActivitiesKeys = (array) array_rand($activities, rand(1, 3));
+            foreach ($randomActivitiesKeys as $key) {
+                $entry->addActivity($activities[$key]);
+            }
 
-        $manager->persist($entrada);
+            // Añadir de 0 a 2 etiquetas aleatorias
+            $numTags = rand(0, 2);
+            if ($numTags > 0) {
+                $randomTagsKeys = (array) array_rand($tags, $numTags);
+                foreach ($randomTagsKeys as $key) {
+                    $entry->addTag($tags[$key]);
+                }
+            }
 
-        // --- ESCENARIO 1: RACHA ACTIVA (Leer 30 min) ---
-        // Tipo: Racha | Periodo: Diario | Estado: Llevamos 5 días seguidos
-        $goalReading = new Goal();
-        $goalReading->setName('Leer 30 minutos');
-        $goalReading->setType(Goal::TYPE_STREAK);
-        $goalReading->setPeriod(Goal::PERIOD_DAILY);
-        $goalReading->setTargetValue(1); // 1 vez al día
-        $goalReading->setUser($user);
-        $goalReading->setCreatedAt(new \DateTimeImmutable());
-        $manager->persist($goalReading);
+            $manager->persist($entry);
+        }
 
-        // Generamos logs para los últimos 5 días (incluido hoy)
-        for ($i = 0; $i < 5; $i++) {
+        // --- 6. OBJETIVOS Y REGISTROS (GOALS) ---
+
+        // Objetivo 1: Racha Activa Perfecta (15 días)
+        $goalMeditation = new Goal();
+        $goalMeditation->setName('Meditar 10 min');
+        $goalMeditation->setType(Goal::TYPE_STREAK);
+        $goalMeditation->setPeriod(Goal::PERIOD_DAILY);
+        $goalMeditation->setUser($user);
+        $goalMeditation->setCreatedAt(new \DateTimeImmutable('-20 days'));
+        $manager->persist($goalMeditation);
+
+        for ($i = 0; $i < 15; $i++) {
             $log = new GoalLog();
-            $log->setGoal($goalReading);
-            $log->setDate(new \DateTimeImmutable("- $i days"));
-            $log->setValue(1); // Cumplido
+            $log->setGoal($goalMeditation)->setDate(new \DateTimeImmutable("- $i days"))->setValue(1);
             $manager->persist($log);
         }
 
-        // --- ESCENARIO 2: RACHA ROTA (Sin Azúcar) ---
-        // Tipo: Racha | Periodo: Diario | Estado: Fallaste ayer (sin log ayer)
-        $goalSugar = new Goal();
-        $goalSugar->setName('Días sin azúcar');
-        $goalSugar->setType(Goal::TYPE_STREAK);
-        $goalSugar->setPeriod(Goal::PERIOD_DAILY);
-        $goalSugar->setUser($user);
-        $goalSugar->setCreatedAt(new \DateTimeImmutable());
-        $manager->persist($goalSugar);
+        // Objetivo 2: Racha Rota (No hizo ayer)
+        $goalJunkFood = new Goal();
+        $goalJunkFood->setName('Cero comida basura');
+        $goalJunkFood->setType(Goal::TYPE_STREAK);
+        $goalJunkFood->setPeriod(Goal::PERIOD_DAILY);
+        $goalJunkFood->setUser($user);
+        $goalJunkFood->setCreatedAt(new \DateTimeImmutable('-30 days'));
+        $manager->persist($goalJunkFood);
 
-        // Generamos logs antiguos (hace 3, 4 y 5 días), pero NO ayer ni hoy
-        for ($i = 3; $i <= 6; $i++) {
+        // Registros (hace 5, 4, 3 y 2 días, pero rompió la racha ayer y hoy)
+        for ($i = 2; $i <= 5; $i++) {
             $log = new GoalLog();
-            $log->setGoal($goalSugar);
-            $log->setDate(new \DateTimeImmutable("- $i days"));
-            $log->setValue(1);
+            $log->setGoal($goalJunkFood)->setDate(new \DateTimeImmutable("- $i days"))->setValue(1);
             $manager->persist($log);
         }
 
-        // --- ESCENARIO 3: SUMA SEMANAL (Pasos) ---
-        // Tipo: Suma | Periodo: Semanal | Meta: 20.000 | Estado: Llevamos ~12.000
+        // Objetivo 3: Acumulativo Semanal (Casi completo)
         $goalSteps = new Goal();
-        $goalSteps->setName('Caminar 20k pasos');
+        $goalSteps->setName('Caminar 50k pasos');
         $goalSteps->setType(Goal::TYPE_SUM);
         $goalSteps->setPeriod(Goal::PERIOD_WEEKLY);
-        $goalSteps->setTargetValue(20000);
+        $goalSteps->setTargetValue(50000);
         $goalSteps->setUser($user);
-        $goalSteps->setCreatedAt(new \DateTimeImmutable());
+        $goalSteps->setCreatedAt(new \DateTimeImmutable('-10 days'));
         $manager->persist($goalSteps);
 
-        // Simulamos unos pasos esta semana
         $logSteps1 = new GoalLog();
-        $logSteps1->setGoal($goalSteps);
-        $logSteps1->setDate(new \DateTimeImmutable('today'));
-        $logSteps1->setValue(5000);
+        $logSteps1->setGoal($goalSteps)->setDate(new \DateTimeImmutable('today'))->setValue(12000);
         $manager->persist($logSteps1);
 
         $logSteps2 = new GoalLog();
-        $logSteps2->setGoal($goalSteps);
-        $logSteps2->setDate(new \DateTimeImmutable('-1 day')); // Ayer
-        $logSteps2->setValue(7500);
+        $logSteps2->setGoal($goalSteps)->setDate(new \DateTimeImmutable('-2 days'))->setValue(15500);
         $manager->persist($logSteps2);
 
-        // Guardamos los cambios físicamente en la base de datos
+        $logSteps3 = new GoalLog();
+        $logSteps3->setGoal($goalSteps)->setDate(new \DateTimeImmutable('-4 days'))->setValue(18000);
+        $manager->persist($logSteps3);
+
+        // Objetivo 4: Acumulativo Mensual
+        $goalReading = new Goal();
+        $goalReading->setName('Leer 500 páginas');
+        $goalReading->setType(Goal::TYPE_SUM);
+        $goalReading->setPeriod(Goal::PERIOD_MONTHLY);
+        $goalReading->setTargetValue(500);
+        $goalReading->setUser($user);
+        $goalReading->setCreatedAt(new \DateTimeImmutable('first day of this month'));
+        $manager->persist($goalReading);
+
+        $logRead1 = new GoalLog();
+        $logRead1->setGoal($goalReading)->setDate(new \DateTimeImmutable('-1 day'))->setValue(50);
+        $manager->persist($logRead1);
+
+        $logRead2 = new GoalLog();
+        $logRead2->setGoal($goalReading)->setDate(new \DateTimeImmutable('-5 days'))->setValue(120);
+        $manager->persist($logRead2);
+
+        // Volcar todo a la base de datos
         $manager->flush();
     }
 }

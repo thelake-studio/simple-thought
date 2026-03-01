@@ -14,8 +14,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EntryType extends AbstractType
+/**
+ * Formulario principal para la creación y edición de entradas del diario emocional.
+ * Gestiona la inyección de los catálogos personalizados del usuario (emociones, actividades, etiquetas).
+ */
+final class EntryType extends AbstractType
 {
+    /**
+     * Construye el formulario añadiendo los campos necesarios.
+     *
+     * @param FormBuilderInterface $builder El constructor del formulario.
+     * @param array $options Opciones adicionales pasadas desde el controlador.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -59,6 +70,12 @@ class EntryType extends AbstractType
         ;
     }
 
+    /**
+     * Configura las opciones por defecto del formulario y define las variables personalizadas esperadas.
+     *
+     * @param OptionsResolver $resolver El resolutor de opciones de Symfony.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

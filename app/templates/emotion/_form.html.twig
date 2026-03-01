@@ -1,52 +1,54 @@
-{# templates/emotion/_form.html.twig #}
+{# --- Formulario de Emoción --- #}
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            {# Fila 1: Nombre #}
-            <div class="mb-3">
-                {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Alegría, Ansiedad, Calma...'}}) }}
-                {{ form_errors(form.name) }}
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+            {# --- Fila 1: Nombre --- #}
+            <div class="mb-4">
+                {{ form_label(form.name, 'Nombre de la Emoción', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Alegría, Ansiedad, Calma...'}}) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.name) }}</div>
             </div>
 
-            {# Fila 2: Valor y Color (en dos columnas) #}
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    {{ form_label(form.value, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.value, {'attr': {'class': 'form-control'}}) }}
-                    <div class="form-text small">Intensidad o peso de la emoción (1 al 10).</div>
-                    {{ form_errors(form.value) }}
+            {# --- Fila 2: Valor y Color --- #}
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    {{ form_label(form.value, 'Intensidad (1-10)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.value, {'attr': {'class': 'form-control form-control-lg bg-light border-0'}}) }}
+                    <div class="form-text small text-muted mt-1">Peso o impacto de la emoción.</div>
+                    <div class="text-danger small mt-1">{{ form_errors(form.value) }}</div>
                 </div>
 
-                <div class="col-md-6 mb-3">
-                    {{ form_label(form.color, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100', 'title': 'Elige un color'}}) }}
-                    {{ form_errors(form.color) }}
+                <div class="col-md-6">
+                    {{ form_label(form.color, 'Color Identificativo', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100 bg-light border-0 shadow-sm', 'title': 'Elige un color'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.color) }}</div>
                 </div>
             </div>
 
-            {# Fila 3: Icono #}
-            <div class="mb-3">
-                {{ form_label(form.icon, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+            {# --- Fila 3: Icono --- #}
+            <div class="mb-4">
+                {{ form_label(form.icon, 'Icono (FontAwesome)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
                 <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fas fa-icons text-muted"></i></span>
-                    {{ form_widget(form.icon, {'attr': {'class': 'form-control', 'placeholder': 'Ej: fa-smile, fa-heart...'}}) }}
+                    <span class="input-group-text bg-light border-0"><i class="fa-solid fa-icons text-muted"></i></span>
+                    {{ form_widget(form.icon, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: fa-solid fa-face-smile'}}) }}
                 </div>
-                <div class="form-text small">
-                    Usa clases de <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" tabindex="-1">FontAwesome</a>. Ej: <code>fa-solid fa-star</code>
+                <div class="form-text small text-muted mt-1">
+                    Usa clases de <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="text-primary text-decoration-none" tabindex="-1">FontAwesome</a>. Ej: <code>fa-solid fa-star</code>
                 </div>
-                {{ form_errors(form.icon) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.icon) }}</div>
             </div>
 
-            {# Botonera #}
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
-                <a href="{{ path('app_emotion_index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-times"></i> Cancelar
+            {# --- Botonera de Acción --- #}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 mt-5 pt-3 border-top">
+                <a href="{{ path('app_emotion_index') }}" class="btn btn-outline-secondary rounded-pill px-4" aria-label="Cancelar y volver al listado">
+                    Cancelar
                 </a>
-                <button class="btn btn-primary px-4">
-                    <i class="fas fa-save"></i> {{ button_label|default('Guardar') }}
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="submit">
+                    <i class="fa-solid fa-save me-2"></i>{{ button_label|default('Guardar Emoción') }}
                 </button>
             </div>
+
         </div>
     </div>
 {{ form_end(form) }}

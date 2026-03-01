@@ -1,33 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registrar Progreso{% endblock %}
+{% block title %}Registrar Progreso - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-12 col-lg-10 col-xl-8">
 
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ path('app_goal_show', {'id': goal.id}) }}" class="btn btn-link text-decoration-none text-muted ps-0">
-                    <i class="bi bi-arrow-left"></i> Volver al objetivo
+            {# --- Cabecera --- #}
+            <header class="mb-4">
+                <a href="{{ path('app_goal_show', {'id': goal.id}) }}" class="text-decoration-none text-secondary small mb-3 d-inline-block" aria-label="Volver al objetivo">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Volver al objetivo
                 </a>
-                <h1 class="h4 mb-0 ms-2">📝 Registrar Progreso Manual</h1>
-            </div>
+                <h1 class="h3 fw-bold text-primary mb-1">
+                    <i class="fa-solid fa-plus-circle me-2"></i>Registrar Progreso Manual
+                </h1>
+                <p class="text-muted small mb-0">Añade un nuevo avance para: <strong class="text-dark">{{ goal.name }}</strong></p>
+            </header>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-light py-3">
-                    <h5 class="card-title mb-0 text-muted">
-                        Para: <strong class="text-dark">{{ goal.name }}</strong>
-                    </h5>
-                </div>
-                <div class="card-body p-4">
-                    {# Incluimos el formulario y pasamos la variable goal #}
-                    {{ include('goal_log/_form.html.twig', {
-                        'button_label': 'Guardar Registro',
-                        'goal': goal
-                    }) }}
-                </div>
-            </div>
+            {# --- Formulario --- #}
+            {{ include('goal_log/_form.html.twig', {
+                'button_label': 'Guardar Registro',
+                'goal': goal
+            }) }}
 
         </div>
     </div>

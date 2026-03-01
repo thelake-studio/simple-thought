@@ -3,235 +3,220 @@
 {% block title %}Analíticas - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
 
-    {# 1. ENCABEZADO Y FILTRO DINÁMICO #}
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-        <h2 class="mb-0">
-            <i class="fa-solid fa-chart-line text-primary me-2"></i> Tus Estadísticas
-        </h2>
+    {# --- CABECERA Y FILTRO DINÁMICO --- #}
+    <header class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-center mb-5 gap-4">
+        <div>
+            <h1 class="h3 fw-bold text-primary mb-1">
+                <i class="fa-solid fa-chart-line me-2"></i>Tus Estadísticas
+            </h1>
+            <p class="text-muted small mb-0">Visualiza tu evolución emocional y descubre patrones.</p>
+        </div>
 
-        {# Formulario GET que envía las fechas a la URL #}
-        <form method="get" action="{{ path('app_stats_index') }}" class="d-flex align-items-center gap-2 bg-white p-2 rounded shadow-sm border">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text bg-light border-end-0"><i class="fa-regular fa-calendar"></i></span>
-                <input type="date" name="start" class="form-control border-start-0" value="{{ currentStart }}" required title="Fecha de inicio">
+        {# Formulario GET (Filtro) #}
+        <form method="get" action="{{ path('app_stats_index') }}" class="d-flex flex-wrap align-items-center gap-2 bg-white p-2 rounded-pill shadow-sm border-0">
+            <div class="input-group input-group-sm rounded-pill overflow-hidden" style="width: auto;">
+                <span class="input-group-text bg-light border-0 pe-2"><i class="fa-regular fa-calendar text-muted"></i></span>
+                <input type="date" name="start" class="form-control border-0 bg-light fw-semibold text-secondary" value="{{ currentStart }}" required aria-label="Fecha de inicio">
             </div>
-            <span class="text-muted small">hasta</span>
-            <div class="input-group input-group-sm">
-                <input type="date" name="end" class="form-control border-end-0" value="{{ currentEnd }}" required title="Fecha de fin">
-                <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-filter"></i> Filtrar</button>
+
+            <span class="text-muted small fw-semibold mx-1">hasta</span>
+
+            <div class="input-group input-group-sm rounded-pill overflow-hidden" style="width: auto;">
+                <input type="date" name="end" class="form-control border-0 bg-light fw-semibold text-secondary" value="{{ currentEnd }}" required aria-label="Fecha de fin">
+                <button type="submit" class="btn btn-primary px-3" aria-label="Filtrar resultados"><i class="fa-solid fa-filter"></i></button>
             </div>
 
             {# Botones de atajo rápido #}
-            <div class="ms-2 border-start ps-2 d-none d-md-flex gap-1">
-                <a href="{{ path('app_stats_index') }}" class="btn btn-sm btn-outline-secondary" title="Últimos 7 días">7d</a>
-                <a href="{{ path('app_stats_index', {'start': 'first day of this month', 'end': 'today'}) }}" class="btn btn-sm btn-outline-secondary" title="Este mes">Mes</a>
+            <div class="ms-1 border-start ps-2 d-none d-md-flex gap-1 align-items-center">
+                <a href="{{ path('app_stats_index') }}" class="btn btn-sm btn-light text-secondary rounded-pill px-3 fw-semibold" aria-label="Ver últimos 7 días">7d</a>
+                <a href="{{ path('app_stats_index', {'start': 'first day of this month', 'end': 'today'}) }}" class="btn btn-sm btn-light text-secondary rounded-pill px-3 fw-semibold" aria-label="Ver este mes">Mes</a>
             </div>
         </form>
-    </div>
+    </header>
 
-    {# 2. ZONA DE GRÁFICAS #}
-    <div class="row">
+    {# --- ZONA DE GRÁFICAS --- #}
+    <section class="row g-4 mb-5">
 
-        {# LA GRÁFICA MAESTRA (Ocupa todo el ancho en pantallas grandes) #}
-        <div class="col-12 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+        {# LA GRÁFICA MAESTRA (Ocupa todo el ancho) #}
+        <div class="col-12">
+            <article class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <h2 class="h5 fw-bold text-dark mb-0">
                         <i class="fa-solid fa-wave-square text-primary me-2"></i> Evolución de tu Ánimo
-                    </h5>
-                    <span class="badge bg-light text-dark border">
-                        {{ currentStart|date('d/m/Y') }} - {{ currentEnd|date('d/m/Y') }}
+                    </h2>
+                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-2 shadow-sm">
+                        <i class="fa-regular fa-calendar-check me-1"></i> {{ currentStart|date('d/m/Y') }} - {{ currentEnd|date('d/m/Y') }}
                     </span>
                 </div>
-                <div class="card-body" style="position: relative; height: 350px;">
-                    <canvas
-                        data-controller="chart"
-                        data-chart-type-value="line"
-                        data-chart-datos-value="{{ moodEvolutionData|json_encode }}"
-                    ></canvas>
+                <div class="card-body p-4" style="position: relative; height: 350px;">
+                    <canvas data-controller="chart" data-chart-type-value="line" data-chart-datos-value="{{ moodEvolutionData|json_encode }}"></canvas>
                 </div>
-            </div>
+            </article>
         </div>
 
         {# TOP ACTIVIDADES (Donut) #}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+        <div class="col-md-6 col-xl-4">
+            <article class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">
                         <i class="fa-solid fa-trophy text-warning me-2"></i> Top 5 Actividades
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body" style="position: relative; height: 300px;">
-                    <canvas
-                        data-controller="chart"
-                        data-chart-type-value="doughnut"
-                        data-chart-datos-value="{{ topActivitiesData|json_encode }}"
-                    ></canvas>
+                <div class="card-body p-4" style="position: relative; height: 300px;">
+                    <canvas data-controller="chart" data-chart-type-value="doughnut" data-chart-datos-value="{{ topActivitiesData|json_encode }}"></canvas>
                 </div>
-            </div>
+            </article>
         </div>
 
         {# MATRIZ ACTIVIDAD-EMOCIÓN (Barras) #}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+        <div class="col-md-6 col-xl-4">
+            <article class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">
                         <i class="fa-solid fa-bolt text-info me-2"></i> Impacto en el Ánimo
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body" style="position: relative; height: 300px;">
-                    <canvas
-                        data-controller="chart"
-                        data-chart-type-value="bar"
-                        data-chart-datos-value="{{ activityMoodMatrixData|json_encode }}"
-                    ></canvas>
+                <div class="card-body p-4" style="position: relative; height: 300px;">
+                    <canvas data-controller="chart" data-chart-type-value="bar" data-chart-datos-value="{{ activityMoodMatrixData|json_encode }}"></canvas>
                 </div>
-            </div>
+            </article>
         </div>
 
         {# CRUCE: OBJETIVOS VS ÁNIMO (Barras comparativas) #}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+        <div class="col-md-6 col-xl-4">
+            <article class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">
                         <i class="fa-solid fa-bullseye text-success me-2"></i> Objetivos vs. Ánimo
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body" style="position: relative; height: 300px;">
-                    <canvas
-                        data-controller="chart"
-                        data-chart-type-value="bar"
-                        data-chart-datos-value="{{ goalMoodCorrelationData|json_encode }}"
-                    ></canvas>
+                <div class="card-body p-4" style="position: relative; height: 300px;">
+                    <canvas data-controller="chart" data-chart-type-value="bar" data-chart-datos-value="{{ goalMoodCorrelationData|json_encode }}"></canvas>
                 </div>
-            </div>
+            </article>
         </div>
 
         {# RADAR DE CONTEXTO (Nube de Etiquetas) #}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
+        <div class="col-md-6 col-xl-12">
+            <article class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h2 class="h5 fw-bold text-dark mb-0">
                         <i class="fa-solid fa-tags text-primary me-2"></i> Radar de Contexto
-                    </h5>
+                    </h2>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-4 p-md-5">
+                    <div class="row g-5">
+                        {# 🌟 Potenciadores #}
+                        <div class="col-xl-6">
+                            <h3 class="h6 text-uppercase fw-bold text-success mb-4" style="letter-spacing: 1px;">
+                                <i class="fa-solid fa-arrow-trend-up me-2"></i> Potenciadores (Días Felices)
+                            </h3>
+                            {% if tagContextData.positive is empty %}
+                                <div class="bg-light rounded-4 p-4 text-center border">
+                                    <p class="text-muted small fw-semibold mb-0">No hay etiquetas en días con nota ≥ 8.</p>
+                                </div>
+                            {% else %}
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for name, data in tagContextData.positive %}
+                                        <span class="badge rounded-pill shadow-sm d-flex align-items-center py-2 px-3 border" style="background-color: {{ data.color|default('#fff') }}; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                            <i class="fa-solid fa-tag me-2 small"></i> <span class="fw-semibold" style="font-size: 0.95rem;">{{ name }}</span>
+                                            <span class="badge bg-white text-dark ms-2 rounded-circle shadow-sm" style="font-size: 0.75rem;">{{ data.count }}</span>
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
 
-                    {# 🌟 Potenciadores (Días Felices) #}
-                    <div class="mb-4">
-                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-up text-success"></i> Tus Potenciadores (Notas Altas)</h6>
-                        {% if tagContextData.positive is empty %}
-                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota mayor o igual a 8 en este periodo.</p>
-                        {% else %}
-                            <div class="d-flex flex-wrap gap-2">
-                                {% for name, data in tagContextData.positive %}
-                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
-                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
-                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
+                        {# ⚓ Frenos #}
+                        <div class="col-xl-6">
+                            <h3 class="h6 text-uppercase fw-bold text-danger mb-4" style="letter-spacing: 1px;">
+                                <i class="fa-solid fa-arrow-trend-down me-2"></i> Frenos (Días Difíciles)
+                            </h3>
+                            {% if tagContextData.negative is empty %}
+                                <div class="bg-light rounded-4 p-4 text-center border">
+                                    <p class="text-muted small fw-semibold mb-0">No hay etiquetas en días con nota ≤ 4.</p>
+                                </div>
+                            {% else %}
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for name, data in tagContextData.negative %}
+                                        <span class="badge rounded-pill shadow-sm d-flex align-items-center py-2 px-3 border" style="background-color: {{ data.color|default('#fff') }}; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                            <i class="fa-solid fa-tag me-2 small"></i> <span class="fw-semibold" style="font-size: 0.95rem;">{{ name }}</span>
+                                            <span class="badge bg-white text-dark ms-2 rounded-circle shadow-sm" style="font-size: 0.75rem;">{{ data.count }}</span>
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-
-                    <hr class="text-muted">
-
-                    {# ⚓ Frenos (Días Difíciles) #}
-                    <div>
-                        <h6 class="text-muted mb-3"><i class="fa-solid fa-arrow-down text-danger"></i> Tus Frenos (Notas Bajas)</h6>
-                        {% if tagContextData.negative is empty %}
-                            <p class="text-muted small border p-3 rounded bg-light">No hay etiquetas registradas en días con nota menor o igual a 4 en este periodo.</p>
-                        {% else %}
-                            <div class="d-flex flex-wrap gap-2">
-                                {% for name, data in tagContextData.negative %}
-                                    <span class="badge rounded-pill shadow-sm p-2 d-flex align-items-center" style="background-color: {{ data.color }}; font-size: 0.9rem;">
-                                        <i class="fa-solid fa-tag me-2"></i> {{ name }}
-                                        <span class="badge bg-white text-dark ms-2 rounded-circle" style="opacity: 0.8;">{{ data.count }}</span>
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    </div>
-
                 </div>
-            </div>
+            </article>
         </div>
+    </section>
 
-        {# 3. EL AÑO EN PÍXELES (Mapa de Calor) #}
-    <div class="row mt-2">
-        <div class="col-12 mb-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fa-solid fa-calendar-days text-primary me-2"></i> Tu Año en Píxeles ({{ yearInPixelsData.year }})
-                    </h5>
-                </div>
-                <div class="card-body">
+    {# --- EL AÑO EN PÍXELES (Mapa de Calor) --- #}
+    <section>
+        <article class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                <h2 class="h5 fw-bold text-dark mb-0">
+                    <i class="fa-solid fa-calendar-days text-primary me-2"></i> Tu Año en Píxeles ({{ yearInPixelsData.year }})
+                </h2>
+            </div>
 
-                    {# Contenedor Responsive para la tabla #}
-                    <div class="table-responsive">
-                        <table class="table table-sm table-bordered text-center mb-0" style="table-layout: fixed; min-width: 600px;">
-                            <thead class="bg-light">
+            <div class="card-body p-4 p-xl-5">
+                <div class="table-responsive rounded-4 border shadow-sm mb-4">
+                    <table class="table table-sm text-center mb-0" style="table-layout: fixed; min-width: 600px;">
+                        <thead class="bg-light border-bottom">
+                            <tr>
+                                <th style="width: 45px;" class="text-muted small text-uppercase fw-bold border-end">Día</th>
+                                {% set meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] %}
+                                {% for mes in meses %}
+                                    <th class="text-muted small text-uppercase fw-bold">{{ mes }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for d in 1..31 %}
                                 <tr>
-                                    <th style="width: 45px;" class="text-muted small">Día</th>
-                                    {% set meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'] %}
-                                    {% for mes in meses %}
-                                        <th class="text-muted small">{{ mes }}</th>
+                                    <td class="bg-light text-secondary small fw-bold align-middle border-end border-bottom-0">{{ d }}</td>
+                                    {% for m in 1..12 %}
+                                        {% set note = yearInPixelsData.calendar[m][d] ?? null %}
+                                        {% set bgColor = '#f8f9fa' %}
+
+                                        {% if note is not null %}
+                                            {% if note >= 9 %} {% set bgColor = '#198754' %}
+                                            {% elseif note >= 7 %} {% set bgColor = '#20c997' %}
+                                            {% elseif note >= 5 %} {% set bgColor = '#ffc107' %}
+                                            {% elseif note >= 3 %} {% set bgColor = '#fd7e14' %}
+                                            {% else %} {% set bgColor = '#dc3545' %}
+                                            {% endif %}
+                                        {% endif %}
+
+                                        <td style="background-color: {{ bgColor }}; height: 30px; cursor: help; transition: transform 0.1s, filter 0.2s;" class="border border-white shadow-sm"
+                                            title="Día {{ d }}/{{ m }} - {% if note is not null %}Nota media: {{ note }}{% else %}Sin registros{% endif %}"
+                                            onmouseover="this.style.filter='brightness(0.85)'; this.style.transform='scale(1.1)';"
+                                            onmouseout="this.style.filter='brightness(1)'; this.style.transform='scale(1)';">
+                                        </td>
                                     {% endfor %}
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {# Bucle de 31 días (Filas) #}
-                                {% for d in 1..31 %}
-                                    <tr>
-                                        <td class="bg-light text-muted small fw-bold align-middle">{{ d }}</td>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-                                        {# Bucle de 12 meses (Columnas) #}
-                                        {% for m in 1..12 %}
-                                            {# Extraemos la nota de la matriz (usamos ?? null por si el día no existe en ese mes, como el 30 de febrero) #}
-                                            {% set note = yearInPixelsData.calendar[m][d] ?? null %}
-
-                                            {# Asignamos el color según la nota #}
-                                            {% set bgColor = '#f8f9fa' %} {# Por defecto: Gris muy clarito (vacío) #}
-                                            {% if note is not null %}
-                                                {% if note >= 9 %} {% set bgColor = '#198754' %} {# Verde oscuro (9-10) #}
-                                                {% elseif note >= 7 %} {% set bgColor = '#20c997' %} {# Verde claro (7-8) #}
-                                                {% elseif note >= 5 %} {% set bgColor = '#ffc107' %} {# Amarillo (5-6) #}
-                                                {% elseif note >= 3 %} {% set bgColor = '#fd7e14' %} {# Naranja (3-4) #}
-                                                {% else %} {% set bgColor = '#dc3545' %} {# Rojo (1-2) #}
-                                                {% endif %}
-                                            {% endif %}
-
-                                            {# Pintamos la celda. Le ponemos un 'title' para que al pasar el ratón se vea la nota exacta #}
-                                            <td style="background-color: {{ bgColor }}; height: 25px; cursor: help; transition: filter 0.2s;"
-                                                title="Día {{ d }}/{{ m }} - {% if note is not null %}Nota media: {{ note }}{% else %}Sin registros{% endif %}"
-                                                onmouseover="this.style.filter='brightness(0.8)'"
-                                                onmouseout="this.style.filter='brightness(1)'">
-                                            </td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {# Leyenda de colores #}
-                    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4 text-muted small">
-                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #198754; width:15px; height:15px;">&nbsp;</span> Excelente (9-10)</span>
-                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #20c997; width:15px; height:15px;">&nbsp;</span> Bueno (7-8)</span>
-                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #ffc107; width:15px; height:15px;">&nbsp;</span> Regular (5-6)</span>
-                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #fd7e14; width:15px; height:15px;">&nbsp;</span> Difícil (3-4)</span>
-                        <span class="d-flex align-items-center"><span class="badge me-1" style="background-color: #dc3545; width:15px; height:15px;">&nbsp;</span> Malo (1-2)</span>
-                        <span class="d-flex align-items-center"><span class="border rounded me-1" style="background-color: #f8f9fa; width:15px; height:15px;">&nbsp;</span> Sin datos</span>
-                    </div>
-
+                {# Leyenda de colores #}
+                <div class="d-flex justify-content-center flex-wrap gap-4 text-secondary small fw-semibold">
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #198754; width:16px; height:16px;"></span> Excelente (9-10)</span>
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #20c997; width:16px; height:16px;"></span> Bueno (7-8)</span>
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #ffc107; width:16px; height:16px;"></span> Regular (5-6)</span>
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #fd7e14; width:16px; height:16px;"></span> Difícil (3-4)</span>
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #dc3545; width:16px; height:16px;"></span> Malo (1-2)</span>
+                    <span class="d-flex align-items-center"><span class="rounded-circle shadow-sm border me-2" style="background-color: #f8f9fa; width:16px; height:16px;"></span> Sin datos</span>
                 </div>
             </div>
-        </div>
-    </div>
+        </article>
+    </section>
 
-    </div>
 </div>
 {% endblock %}

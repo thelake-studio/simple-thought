@@ -1,45 +1,128 @@
+{# --- base.html.twig --- #}
 <!DOCTYPE html>
 <html lang="es">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Simple Thought{% endblock %}</title>
+
+        {% block stylesheets %}
+        {% endblock %}
 
         {% block javascripts %}
             {{ importmap('app') }}
         {% endblock %}
     </head>
-    <body>
-        <div class="d-flex">
-            <nav class="sidebar bg-dark text-white vh-100 position-fixed" style="width: 260px;">
-                <div class="p-4">
-                    <h3 class="h4 mb-4">🧠 Simple Thought</h3>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a href="{{ path('app_home') }}" class="nav-link text-white active">
-                                <i class="fa-solid fa-house me-2"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ path('app_profile_index') }}" class="nav-link text-white">
-                                <i class="fa-solid fa-user-circle me-2"></i> Mi Perfil
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+    <body class="bg-light">
 
-                <div class="position-absolute bottom-0 w-100 p-4 border-top border-secondary">
-                    {% if app.user %}
-                        <div class="mb-2 small">{{ app.user.nickname }}</div>
-                        <a href="{{ path('app_logout') }}" class="btn btn-sm btn-outline-danger w-100">Salir</a>
-                    {% endif %}
-                </div>
-            </nav>
+        {# --- Topbar Móvil (Solo visible en pantallas pequeñas) --- #}
+        <nav class="navbar bg-white shadow-sm d-md-none sticky-top px-2">
+            <div class="container-fluid">
+                <a class="navbar-brand text-primary fw-bold" href="{{ path('app_home') }}">
+                    <i class="fa-solid fa-brain me-2"></i>Simple Thought
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-label="Abrir menú de navegación">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>
 
-            <main class="ms-auto p-5" style="width: calc(100% - 260px);">
-                <div class="container-fluid">
+        <div class="container-fluid p-0">
+            <div class="row g-0 flex-nowrap min-vh-100">
+
+                {# --- Barra de Navegación Lateral (Fija en PC con sticky-md-top vh-100) --- #}
+                <aside class="col-md-3 col-xl-2 offcanvas-md offcanvas-start bg-white shadow-sm d-flex flex-column sticky-md-top vh-100" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+
+                    {# Cabecera del Offcanvas (solo visible en móvil) #}
+                    <div class="offcanvas-header border-bottom d-md-none">
+                        <h5 class="offcanvas-title text-primary fw-bold" id="sidebarMenuLabel">
+                            <i class="fa-solid fa-brain me-2"></i>Simple Thought
+                        </h5>
+                        <button type="button" class="btn-close shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Cerrar menú"></button>
+                    </div>
+
+                    {# Cuerpo de la navegación #}
+                    <div class="offcanvas-body d-flex flex-column justify-content-between p-4 h-100 overflow-auto">
+                        <div>
+                            {# Logo para PC (solo visible en pantallas medianas o superiores) #}
+                            <a href="{{ path('app_home') }}" class="d-none d-md-flex align-items-center mb-5 text-decoration-none text-primary" aria-label="Ir a la página principal">
+                                <i class="fa-solid fa-brain fs-3 me-2"></i>
+                                <span class="fs-5 fw-bold">Simple Thought</span>
+                            </a>
+
+                            <nav>
+                                <ul class="nav flex-column gap-2">
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_home') }}" class="nav-link fw-semibold rounded-3 {% if app.request.attributes.get('_route') == 'app_home' %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir al inicio">
+                                            <i class="fa-solid fa-house me-2"></i>Inicio
+                                        </a>
+                                    </li>
+                                    {# Acceso al Diario #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_entry_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_entry' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi diario">
+                                            <i class="fa-solid fa-book-open me-2"></i>Mi Diario
+                                        </a>
+                                    </li>
+                                    {# Acceso a Objetivos #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_goal_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_goal' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mis objetivos">
+                                            <i class="fa-solid fa-bullseye me-2"></i>Mis Objetivos
+                                        </a>
+                                    </li>
+                                    {# Acceso a Estadísticas #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_stats_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_stats' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mis estadísticas">
+                                            <i class="fa-solid fa-chart-line me-2"></i>Estadísticas
+                                        </a>
+                                    </li>
+                                    {# Acceso al Perfil #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_profile_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_profile' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi perfil">
+                                            <i class="fa-solid fa-user-circle me-2"></i>Mi Perfil
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        {# --- Sección de Usuario y Cierre de Sesión --- #}
+                        {% if app.user %}
+                            <div class="mt-auto border-top pt-4">
+                                <div class="mb-3 text-truncate fw-semibold text-secondary small">
+                                    Hola, {{ app.user.nickname }}
+                                </div>
+                                <a href="{{ path('app_logout') }}" class="btn btn-outline-danger w-100 rounded-pill" aria-label="Cerrar sesión">
+                                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i>Salir
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </aside>
+
+                {# --- Contenido Principal --- #}
+                <main class="col p-4 p-md-5">
+
+                    {# --- Sistema Global de Mensajes Flash (Feedback UI Kit) --- #}
+                    <div aria-live="polite" aria-atomic="true" class="mb-4">
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                {% set alertClass = label == 'error' ? 'danger' : (label == 'success' ? 'success' : 'warning') %}
+                                {% set alertIcon = label == 'error' ? 'fa-circle-xmark' : (label == 'success' ? 'fa-circle-check' : 'fa-triangle-exclamation') %}
+
+                                <div class="alert alert-{{ alertClass }} border-0 shadow-sm rounded-3 d-flex align-items-center alert-dismissible fade show" role="alert">
+                                    <i class="fa-solid {{ alertIcon }} fs-4 me-3"></i>
+                                    <div>{{ message }}</div>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar alerta"></button>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+
+                    {# --- Bloque de Contenido Dinámico de las Vistas --- #}
                     {% block body %}{% endblock %}
-                </div>
-            </main>
+                </main>
+
+            </div>
         </div>
     </body>
 </html>

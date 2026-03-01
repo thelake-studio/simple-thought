@@ -10,8 +10,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ActivityType extends AbstractType
+/**
+ * Formulario para la creación y edición de Actividades.
+ * Define los campos, tipos y atributos visuales requeridos para la entidad Activity.
+ */
+final class ActivityType extends AbstractType
 {
+    /**
+     * Construye el formulario añadiendo los campos necesarios.
+     *
+     * @param FormBuilderInterface $builder El constructor del formulario.
+     * @param array $options Opciones adicionales para el formulario.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -43,6 +54,13 @@ class ActivityType extends AbstractType
         ;
     }
 
+    /**
+     * Configura las opciones por defecto del formulario.
+     * Vincula este formulario directamente con la entidad Activity.
+     *
+     * @param OptionsResolver $resolver El resolutor de opciones de Symfony.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

@@ -9,6 +9,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entidad que representa una emoción personalizada dentro del catálogo del usuario.
+ * Define el estado de ánimo principal asociado a las entradas del diario.
+ */
 #[ORM\Entity(repositoryClass: EmotionRepository::class)]
 class Emotion
 {
@@ -123,6 +127,8 @@ class Emotion
     }
 
     /**
+     * Obtiene todas las entradas del diario que están asociadas a esta emoción.
+     *
      * @return Collection<int, Entry>
      */
     public function getEntries(): Collection
@@ -130,6 +136,12 @@ class Emotion
         return $this->entries;
     }
 
+    /**
+     * Asocia una entrada del diario a esta emoción.
+     *
+     * @param Entry $entry La entrada a vincular.
+     * @return static
+     */
     public function addEntry(Entry $entry): static
     {
         if (!$this->entries->contains($entry)) {
@@ -140,10 +152,15 @@ class Emotion
         return $this;
     }
 
+    /**
+     * Desvincula una entrada del diario de esta emoción.
+     *
+     * @param Entry $entry La entrada a desvincular.
+     * @return static
+     */
     public function removeEntry(Entry $entry): static
     {
         if ($this->entries->removeElement($entry)) {
-            // set the owning side to null (unless already changed)
             if ($entry->getEmotion() === $this) {
                 $entry->setEmotion(null);
             }

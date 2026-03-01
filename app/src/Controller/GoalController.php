@@ -5,8 +5,8 @@ namespace App\Controller;
 use App\Entity\Goal;
 use App\Entity\GoalLog;
 use App\Form\GoalType;
-use App\Repository\GoalRepository;
 use App\Repository\GoalLogRepository;
+use App\Repository\GoalRepository;
 use App\Service\GoalService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,22 +14,44 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controlador encargado de gestionar el CRUD y las interacciones de los objetivos (Goals).
+ * Permite al usuario crear metas, visualizar su progreso y registrar nuevos avances.
+ */
 #[Route('/goals')]
 #[IsGranted('ROLE_USER')]
 final class GoalController extends AbstractController
 {
-    #[Route('/', name: 'app_goal_index', methods: ['GET'])]
-    public function index(GoalRepository $goalRepository, GoalService $goalService): Response
-    {
-        $goals = $goalRepository->findByUser($this->getUser());
+    /**
+     * Constructor para la inyección de dependencias centralizada.
+     *
+     * @param GoalRepository $goalRepository Repositorio de objetivos.
+     * @param GoalLogRepository $goalLogRepository Repositorio de registros de progreso.
+     * @param GoalService $goalService Servicio con la lógica de cálculo de rachas y progresos.
+     */
+    public function __construct(
+        private readonly GoalRepository $goalRepository,
+        private readonly GoalLogRepository $goalLogRepository,
+        private readonly GoalService $goalService
+    ) {
+    }
 
+    /**
+     * Muestra el panel principal de objetivos del usuario, calculando el progreso actual de cada uno.
+     *
+     * @return Response La vista renderizada con el Dashboard de objetivos.
+     */
+    #[Route('/', name: 'app_goal_index', methods: ['GET'])]
+    public function index(): Response
+    {
+        $goals = $this->goalRepository->findByUser($this->getUser());
         $dashboardData = [];
 
         foreach ($goals as $goal) {
             if ($goal->getType() === Goal::TYPE_SUM) {
-                $stats = $goalService->getProgress($goal);
+                $stats = $this->goalService->getProgress($goal);
             } else {
-                $stats = $goalService->getStreak($goal);
+                $stats = $this->goalService->getStreak($goal);
             }
 
             $dashboardData[] = [
@@ -43,8 +65,14 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    /**
+     * Despliega y procesa el formulario para crear un nuevo objetivo.
+     *
+     * @param Request $request Petición HTTP con los datos del formulario.
+     * @return Response Redirección al índice si tiene éxito, o vista del formulario en caso contrario.
+     */
     #[Route('/new', name: 'app_goal_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, GoalRepository $goalRepository): Response
+    public function new(Request $request): Response
     {
         $goal = new Goal();
         $form = $this->createForm(GoalType::class, $goal);
@@ -52,10 +80,9 @@ final class GoalController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $goal->setUser($this->getUser());
-            // Guardamos la fecha de creación automáticamente si no está en el constructor
             $goal->setCreatedAt(new \DateTimeImmutable());
 
-            $goalRepository->save($goal, true);
+            $this->goalRepository->save($goal, true);
 
             $this->addFlash('success', '¡Nuevo objetivo definido! A por ello.');
 
@@ -68,50 +95,65 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    /**
+     * Registra un nuevo avance (log) para un objetivo específico desde el Dashboard.
+     *
+     * @param Request $request Petición HTTP con los datos del avance y token CSRF.
+     * @param Goal $goal Objetivo al que se le aplicará el avance.
+     * @return Response Redirección al índice de objetivos.
+     */
     #[Route('/{id}/log', name: 'app_goal_log', methods: ['POST'])]
-    public function log(Request $request, Goal $goal, GoalLogRepository $logRepository): Response
+    public function log(Request $request, Goal $goal): Response
     {
-        // 1. Seguridad: Verificar propiedad
         if ($goal->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para registrar progreso en este objetivo.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
-        // 2. Comprobación de Token CSRF (Seguridad extra para formularios)
         $token = $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('log-goal'.$goal->getId(), $token)) {
+        if (!$this->isCsrfTokenValid('log-goal'.$goal->getId(), (string) $token)) {
              $this->addFlash('error', 'Token de seguridad inválido. Inténtalo de nuevo.');
+
              return $this->redirectToRoute('app_goal_index');
         }
 
-        // 3. Recuperar el valor.
         $value = $request->request->get('value');
-        $amount = is_numeric($value) ? (int)$value : 1;
+        $amount = is_numeric($value) ? (int) $value : 1;
 
-        // 4. Crear el registro
         $log = new GoalLog();
         $log->setGoal($goal);
         $log->setDate(new \DateTimeImmutable('today'));
         $log->setValue($amount);
 
-        $logRepository->save($log, true);
+        $this->goalLogRepository->save($log, true);
 
         $this->addFlash('success', '¡Progreso registrado! Sigue así.');
 
         return $this->redirectToRoute('app_goal_index');
     }
 
+    /**
+     * Muestra y procesa la edición de un objetivo existente.
+     *
+     * @param Request $request Petición HTTP con los datos del formulario.
+     * @param Goal $goal Objetivo a editar.
+     * @return Response Redirección tras la edición o renderizado del formulario.
+     */
     #[Route('/{id}/edit', name: 'app_goal_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Goal $goal, GoalRepository $goalRepository): Response
+    public function edit(Request $request, Goal $goal): Response
     {
         if ($goal->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para editar este objetivo.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
         $form = $this->createForm(GoalType::class, $goal);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $goalRepository->save($goal, true);
+            $this->goalRepository->save($goal, true);
 
             $this->addFlash('success', 'Objetivo actualizado.');
 
@@ -124,21 +166,28 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    /**
+     * Muestra los detalles de un objetivo, incluyendo su histórico completo de avances.
+     *
+     * @param Goal $goal El objetivo a visualizar.
+     * @return Response Vista con los detalles y estadísticas del objetivo.
+     */
     #[Route('/{id}', name: 'app_goal_show', methods: ['GET'])]
-    public function show(Goal $goal, GoalService $goalService, GoalLogRepository $logRepository): Response
+    public function show(Goal $goal): Response
     {
-        // Seguridad
         if ($goal->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para visualizar este objetivo.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
         if ($goal->getType() === Goal::TYPE_SUM) {
-            $stats = $goalService->getProgress($goal);
+            $stats = $this->goalService->getProgress($goal);
         } else {
-            $stats = $goalService->getStreak($goal);
+            $stats = $this->goalService->getStreak($goal);
         }
 
-        $history = $logRepository->findLogsForGoal($goal);
+        $history = $this->goalLogRepository->findLogsForGoal($goal);
 
         return $this->render('goal/show.html.twig', [
             'goal' => $goal,
@@ -147,16 +196,27 @@ final class GoalController extends AbstractController
         ]);
     }
 
+    /**
+     * Elimina de forma segura un objetivo y todo su progreso asociado en cascada.
+     *
+     * @param Request $request Petición HTTP para la validación del token CSRF.
+     * @param Goal $goal El objetivo a eliminar.
+     * @return Response Redirección al índice de objetivos.
+     */
     #[Route('/{id}', name: 'app_goal_delete', methods: ['POST'])]
-    public function delete(Request $request, Goal $goal, GoalRepository $goalRepository): Response
+    public function delete(Request $request, Goal $goal): Response
     {
         if ($goal->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para eliminar este objetivo.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$goal->getId(), $request->request->get('_token'))) {
-            $goalRepository->remove($goal, true);
-            $this->addFlash('success', 'Objetivo eliminado.');
+        if ($this->isCsrfTokenValid('delete'.$goal->getId(), (string) $request->request->get('_token'))) {
+            $this->goalRepository->remove($goal, true);
+            $this->addFlash('success', 'Objetivo eliminado correctamente.');
+        } else {
+            $this->addFlash('error', 'Token de seguridad inválido. No se pudo eliminar.');
         }
 
         return $this->redirectToRoute('app_goal_index');

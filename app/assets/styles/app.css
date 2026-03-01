@@ -1,11 +1,14 @@
-/* assets/styles/app.css */
+/**
+ * Hoja de estilos principal de la aplicación.
+ * Gestiona la importación de librerías de terceros (Bootstrap, FontAwesome)
+ * y define los estilos base globales de la interfaz.
+ */
 
-/* Importamos Bootstrap */
+/* --- Librerías de Terceros --- */
 @import "../vendor/bootstrap/dist/css/bootstrap.min.css";
-
-/* 2. FontAwesome */
 @import "../vendor/@fortawesome/fontawesome-free/css/all.min.css";
 
+/* --- Estilos Base Globales --- */
 body {
     background-color: #f4f7f6;
 }

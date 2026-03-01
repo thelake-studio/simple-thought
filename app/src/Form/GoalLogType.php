@@ -9,8 +9,19 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class GoalLogType extends AbstractType
+/**
+ * Formulario para el registro de progresos diarios en los objetivos (Goals).
+ * Permite al usuario introducir la fecha y la cantidad o valor numérico de su avance.
+ */
+final class GoalLogType extends AbstractType
 {
+    /**
+     * Construye el formulario añadiendo los campos necesarios.
+     *
+     * @param FormBuilderInterface $builder El constructor del formulario.
+     * @param array $options Opciones adicionales para el formulario.
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -31,6 +42,13 @@ class GoalLogType extends AbstractType
         ;
     }
 
+    /**
+     * Configura las opciones por defecto del formulario.
+     * Vincula este formulario directamente con la entidad GoalLog.
+     *
+     * @param OptionsResolver $resolver El resolutor de opciones de Symfony.
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

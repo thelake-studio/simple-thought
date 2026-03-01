@@ -6,8 +6,17 @@ use App\Entity\User;
 use App\Repository\EntryRepository;
 use App\Repository\GoalLogRepository;
 
-class StatsService
+/**
+ * Servicio encargado de generar las estadísticas y métricas cruzadas de la aplicación.
+ * Procesa datos de entradas del diario, estados de ánimo, actividades y objetivos
+ * para estructurarlos y alimentar las visualizaciones interactivas (Chart.js).
+ */
+final class StatsService
 {
+    /**
+     * @param EntryRepository $entryRepository Repositorio de entradas del diario.
+     * @param GoalLogRepository $goalLogRepository Repositorio de registros de objetivos.
+     */
     public function __construct(
         private readonly EntryRepository $entryRepository,
         private readonly GoalLogRepository $goalLogRepository
@@ -15,18 +24,24 @@ class StatsService
     }
 
     /**
-     * Evolución del Ánimo Dinámica: Calcula la media de ánimo en un rango de fechas.
+     * Calcula la evolución media diaria del estado de ánimo en un rango de fechas.
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $startDate Fecha de inicio del análisis.
+     * @param \DateTimeInterface $endDate Fecha de fin del análisis.
+     * @return array<string, mixed> Datos estructurados para el gráfico de líneas.
      */
-    public function getMoodEvolutionData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    public function getMoodEvolutionData(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        // 1. Buscamos las entradas en ese rango específico
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
-        // 2. Generamos un array con todos los días del rango
+        // Convertimos a DateTimeImmutable de forma segura para usar modify() sin romper la interfaz
+        $endPeriodDate = \DateTimeImmutable::createFromInterface($endDate)->modify('+1 day');
+
         $period = new \DatePeriod(
             $startDate,
             new \DateInterval('P1D'),
-            (clone $endDate)->modify('+1 day')
+            $endPeriodDate
         );
 
         $dailyData = [];
@@ -34,7 +49,6 @@ class StatsService
             $dailyData[$date->format('d/m')] = [];
         }
 
-        // 3. Rellenamos el array con las notas de ánimo de las entradas reales
         foreach ($entries as $entry) {
             if ($entry->getMoodValueSnapshot() !== null) {
                 $dateKey = $entry->getDate()->format('d/m');
@@ -45,7 +59,6 @@ class StatsService
             }
         }
 
-        // 4. Calculamos la media de cada día
         $labels = [];
         $dataPoints = [];
         foreach ($dailyData as $day => $values) {
@@ -53,7 +66,6 @@ class StatsService
             $dataPoints[] = count($values) > 0 ? array_sum($values) / count($values) : null;
         }
 
-        // 5. Devolvemos el formato de Chart.js
         return [
             'labels' => $labels,
             'datasets' => [
@@ -71,11 +83,15 @@ class StatsService
     }
 
     /**
-     * Top Actividades: Ahora dinámico por fechas
+     * Obtiene las actividades más frecuentes registradas en un periodo específico.
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $startDate Fecha de inicio del análisis.
+     * @param \DateTimeInterface $endDate Fecha de fin del análisis.
+     * @return array<string, mixed> Top 5 de actividades para un gráfico de pastel/anillo.
      */
-    public function getTopActivitiesData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    public function getTopActivitiesData(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        // 1. Usamos la misma consulta que creamos para la evolución
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
         $activityCounts = [];
@@ -107,11 +123,15 @@ class StatsService
     }
 
     /**
-     * Matriz de Impacto: Ahora dinámica por fechas
+     * Genera una matriz de impacto calculando la nota media de ánimo asociada a cada actividad.
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $startDate Fecha de inicio del análisis.
+     * @param \DateTimeInterface $endDate Fecha de fin del análisis.
+     * @return array<string, mixed> Datos de correlación entre actividades y estado de ánimo.
      */
-    public function getActivityMoodMatrixData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    public function getActivityMoodMatrixData(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        // 1. Filtramos por fechas
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
         $activityMoods = [];
@@ -151,21 +171,24 @@ class StatsService
     }
 
     /**
-     * Métrica Cruzada: Ánimo en días con objetivos vs. días sin objetivos
+     * Calcula la correlación entre el cumplimiento de objetivos y el estado de ánimo promedio.
+     * Compara los días con avance registrado frente a los días sin avance.
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $startDate Fecha de inicio del análisis.
+     * @param \DateTimeInterface $endDate Fecha de fin del análisis.
+     * @return array<string, mixed> Datos comparativos para Chart.js.
      */
-    public function getGoalMoodCorrelationData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    public function getGoalMoodCorrelationData(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        // 1. Extraemos las entradas y los progresos de ese periodo
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
         $goalLogs = $this->goalLogRepository->findLogsBetweenDates($user, $startDate, $endDate);
 
-        // 2. Creamos un "calendario" rápido para saber qué días hubo avance
         $daysWithGoals = [];
         foreach ($goalLogs as $log) {
             $daysWithGoals[$log->getDate()->format('Y-m-d')] = true;
         }
 
-        // 3. Separamos las notas de ánimo en dos cajas
         $moodsWithGoals = [];
         $moodsWithoutGoals = [];
 
@@ -181,11 +204,9 @@ class StatsService
             }
         }
 
-        // 4. Calculamos las medias (evitando división por cero si no hay datos)
         $avgWithGoals = count($moodsWithGoals) > 0 ? array_sum($moodsWithGoals) / count($moodsWithGoals) : 0;
         $avgWithoutGoals = count($moodsWithoutGoals) > 0 ? array_sum($moodsWithoutGoals) / count($moodsWithoutGoals) : 0;
 
-        // 5. Preparamos el formato para Chart.js
         return [
             'labels' => ['Avanzando en objetivos', 'Sin avances registrados'],
             'datasets' => [
@@ -204,40 +225,38 @@ class StatsService
     }
 
     /**
-     * Radar de Contexto: Top etiquetas asociadas a días muy buenos (>= 8) y muy malos (<= 4).
+     * Extrae las etiquetas (tags) más frecuentemente asociadas a días excepcionalmente buenos (>= 8) o malos (<= 4).
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $startDate Fecha de inicio del análisis.
+     * @param \DateTimeInterface $endDate Fecha de fin del análisis.
+     * @return array<string, array<string, mixed>> Top 3 de etiquetas positivas y negativas con sus recuentos.
      */
-    public function getTagContextData(User $user, \DateTime $startDate, \DateTime $endDate): array
+    public function getTagContextData(User $user, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
     {
-        // 1. Obtenemos las entradas del rango de fechas
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
         $positiveTags = [];
         $negativeTags = [];
 
-        // 2. Clasificamos las etiquetas según el ánimo del día
         foreach ($entries as $entry) {
             $mood = $entry->getMoodValueSnapshot();
 
-            // Si el día no tiene nota, lo saltamos
             if ($mood === null) {
                 continue;
             }
 
             $tags = $entry->getTags();
 
-            // Días muy felices (8, 9, 10)
             if ($mood >= 8) {
                 foreach ($tags as $tag) {
                     $name = $tag->getName();
                     if (!isset($positiveTags[$name])) {
-                        // Guardamos también su color para pintarlo luego en Twig
                         $positiveTags[$name] = ['count' => 0, 'color' => $tag->getColor() ?? '#198754'];
                     }
                     $positiveTags[$name]['count']++;
                 }
-            }
-            // Días difíciles (1, 2, 3, 4)
-            elseif ($mood <= 4) {
+            } elseif ($mood <= 4) {
                 foreach ($tags as $tag) {
                     $name = $tag->getName();
                     if (!isset($negativeTags[$name])) {
@@ -248,11 +267,9 @@ class StatsService
             }
         }
 
-        // 3. Ordenamos las cajas de mayor a menor número de repeticiones (count)
         uasort($positiveTags, fn($a, $b) => $b['count'] <=> $a['count']);
         uasort($negativeTags, fn($a, $b) => $b['count'] <=> $a['count']);
 
-        // 4. Devolvemos solo el Top 3 de cada caja
         return [
             'positive' => array_slice($positiveTags, 0, 3, true),
             'negative' => array_slice($negativeTags, 0, 3, true),
@@ -260,38 +277,37 @@ class StatsService
     }
 
     /**
-     * El Año en Píxeles: Genera una matriz de 12 meses x 31 días con la nota media de cada día.
+     * Genera la estructura de datos para la visualización "El Año en Píxeles".
+     * Organiza la nota media de ánimo en una matriz de meses (1-12) y días (1-31).
+     *
+     * @param User $user El usuario autenticado.
+     * @param \DateTimeInterface $referenceDate Fecha de referencia para extraer el año a consultar.
+     * @return array<string, mixed> Matriz del calendario anual con las notas medias diarias.
      */
-    public function getYearInPixelsData(User $user, \DateTime $referenceDate): array
+    public function getYearInPixelsData(User $user, \DateTimeInterface $referenceDate): array
     {
-        // 1. Obtenemos el año que el usuario está consultando
         $year = $referenceDate->format('Y');
 
-        // Calculamos el inicio y fin de ESE año
         $startDate = new \DateTime("$year-01-01 00:00:00");
         $endDate = new \DateTime("$year-12-31 23:59:59");
 
-        // 2. Buscamos todas las entradas de ese año
         $entries = $this->entryRepository->findEntriesBetweenDates($user, $startDate, $endDate);
 
-        // 3. Preparamos el calendario vacío
         $calendar = [];
         for ($m = 1; $m <= 12; $m++) {
-            // SOLUCIÓN: Usamos DateTime ('t' devuelve el número de días del mes) en lugar de cal_days_in_month
             $dateForMonth = new \DateTime(sprintf('%04d-%02d-01', $year, $m));
             $daysInMonth = (int) $dateForMonth->format('t');
 
             for ($d = 1; $d <= $daysInMonth; $d++) {
-                $calendar[$m][$d] = null; // null significa "sin datos"
+                $calendar[$m][$d] = null;
             }
         }
 
-        // 4. Agrupamos las notas de ánimo de las entradas reales por Mes y Día
         $dailyMoods = [];
         foreach ($entries as $entry) {
             if ($entry->getMoodValueSnapshot() !== null) {
-                $m = (int) $entry->getDate()->format('n'); // Mes sin ceros iniciales (1-12)
-                $d = (int) $entry->getDate()->format('j'); // Día sin ceros iniciales (1-31)
+                $m = (int) $entry->getDate()->format('n');
+                $d = (int) $entry->getDate()->format('j');
 
                 if (!isset($dailyMoods[$m][$d])) {
                     $dailyMoods[$m][$d] = [];
@@ -300,15 +316,12 @@ class StatsService
             }
         }
 
-        // 5. Calculamos la media de cada día y la guardamos en el calendario
         foreach ($dailyMoods as $m => $days) {
             foreach ($days as $d => $moods) {
-                // Redondeamos la nota a número entero para poder asignarle un color luego
                 $calendar[$m][$d] = (int) round(array_sum($moods) / count($moods));
             }
         }
 
-        // Devolvemos el año y la matriz de meses/días
         return [
             'year' => $year,
             'calendar' => $calendar

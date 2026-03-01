@@ -12,15 +12,37 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Controlador encargado de gestionar el CRUD de los registros individuales de progreso (GoalLogs).
+ * Permite añadir, editar y eliminar entradas específicas en el historial de un objetivo.
+ */
 #[IsGranted('ROLE_USER')]
 final class GoalLogController extends AbstractController
 {
+    /**
+     * Constructor para la inyección de dependencias.
+     *
+     * @param GoalLogRepository $goalLogRepository Repositorio para la gestión de registros de progreso.
+     */
+    public function __construct(
+        private readonly GoalLogRepository $goalLogRepository
+    ) {
+    }
+
+    /**
+     * Muestra y procesa el formulario para añadir un nuevo registro de progreso a un objetivo específico.
+     *
+     * @param Request $request La petición HTTP.
+     * @param Goal $goal El objetivo al que se le añadirá el registro.
+     * @return Response Redirección a la vista del objetivo o renderizado del formulario.
+     */
     #[Route('/goals/{id}/log/new', name: 'app_goal_log_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, Goal $goal, GoalLogRepository $goalLogRepository): Response
+    public function new(Request $request, Goal $goal): Response
     {
-        // Seguridad: Verificar que el objetivo es del usuario
         if ($goal->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para añadir registros a este objetivo.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
         $goalLog = new GoalLog();
@@ -31,7 +53,7 @@ final class GoalLogController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $goalLogRepository->save($goalLog, true);
+            $this->goalLogRepository->save($goalLog, true);
 
             $this->addFlash('success', 'Registro añadido al historial.');
 
@@ -45,23 +67,30 @@ final class GoalLogController extends AbstractController
         ]);
     }
 
+    /**
+     * Muestra y procesa la edición de un registro de progreso existente.
+     *
+     * @param Request $request La petición HTTP.
+     * @param GoalLog $goalLog El registro a editar.
+     * @return Response Redirección a la vista del objetivo padre o renderizado del formulario.
+     */
     #[Route('/log/{id}/edit', name: 'app_goal_log_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, GoalLog $goalLog, GoalLogRepository $goalLogRepository): Response
+    public function edit(Request $request, GoalLog $goalLog): Response
     {
-        // Seguridad: Verificar a través del objetivo padre
         if ($goalLog->getGoal()->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para editar este registro.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
         $form = $this->createForm(GoalLogType::class, $goalLog);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $goalLogRepository->save($goalLog, true);
+            $this->goalLogRepository->save($goalLog, true);
 
-            $this->addFlash('success', 'Registro corregido.');
+            $this->addFlash('success', 'Registro corregido correctamente.');
 
-            // Redirigimos al objetivo padre
             return $this->redirectToRoute('app_goal_show', ['id' => $goalLog->getGoal()->getId()]);
         }
 
@@ -71,20 +100,29 @@ final class GoalLogController extends AbstractController
         ]);
     }
 
+    /**
+     * Elimina un registro de progreso del historial de forma segura.
+     *
+     * @param Request $request Petición HTTP para validar el token CSRF.
+     * @param GoalLog $goalLog El registro a eliminar.
+     * @return Response Redirección a la vista de detalle del objetivo padre.
+     */
     #[Route('/log/{id}', name: 'app_goal_log_delete', methods: ['POST'])]
-    public function delete(Request $request, GoalLog $goalLog, GoalLogRepository $goalLogRepository): Response
+    public function delete(Request $request, GoalLog $goalLog): Response
     {
-        // Seguridad
         if ($goalLog->getGoal()->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException();
+            $this->addFlash('error', 'No tienes permiso para eliminar este registro.');
+
+            return $this->redirectToRoute('app_goal_index');
         }
 
-        // Guardamos el ID del padre antes de borrar el hijo para poder redirigir
         $goalId = $goalLog->getGoal()->getId();
 
-        if ($this->isCsrfTokenValid('delete'.$goalLog->getId(), $request->request->get('_token'))) {
-            $goalLogRepository->remove($goalLog, true);
+        if ($this->isCsrfTokenValid('delete'.$goalLog->getId(), (string) $request->request->get('_token'))) {
+            $this->goalLogRepository->remove($goalLog, true);
             $this->addFlash('success', 'Registro eliminado del historial.');
+        } else {
+            $this->addFlash('error', 'Token de seguridad inválido. No se pudo eliminar.');
         }
 
         return $this->redirectToRoute('app_goal_show', ['id' => $goalId]);

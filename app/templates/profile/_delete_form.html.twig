@@ -1,6 +1,7 @@
-<form method="post" action="{{ path('app_profile_delete') }}" onsubmit="return confirm('¿Estás absolutamente seguro de que quieres borrar tu cuenta? Perderás todos tus registros para siempre.');">
+{# --- Formulario de Eliminación de Cuenta --- #}
+<form method="post" action="{{ path('app_profile_delete') }}" onsubmit="return confirm('¿Estás absolutamente seguro de que quieres borrar tu cuenta? Perderás todos tus registros, objetivos y diario para siempre.');" class="d-inline-block w-100">
     <input type="hidden" name="_token" value="{{ csrf_token('delete_account' ~ user.id) }}">
-    <button type="submit" class="btn btn-outline-danger btn-sm">
-        <i class="fa-solid fa-trash-can"></i> Eliminar Cuenta
+    <button type="submit" class="btn btn-outline-danger rounded-pill px-4 w-100 shadow-sm" aria-label="Eliminar mi cuenta definitivamente">
+        <i class="fa-solid fa-trash-can me-2"></i> Eliminar Cuenta
     </button>
 </form>
