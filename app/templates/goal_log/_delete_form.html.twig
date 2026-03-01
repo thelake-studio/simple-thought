@@ -1,6 +1,7 @@
-<form method="post" action="{{ path('app_goal_log_delete', {'id': log_id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar este registro del historial?');">
+{# --- Formulario de Eliminación de Registro --- #}
+<form method="post" action="{{ path('app_goal_log_delete', {'id': log_id}) }}" onsubmit="return confirm('¿Estás seguro de que quieres borrar este registro del historial? Afectará a las estadísticas del objetivo.');" class="d-inline-block w-100">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ log_id) }}">
-    <button class="btn btn-outline-danger w-100">
-        <i class="bi bi-trash"></i> Eliminar Registro
+    <button class="btn btn-outline-danger rounded-pill px-4 w-100 shadow-sm" aria-label="Eliminar este registro">
+        <i class="fa-solid fa-trash me-2"></i>Eliminar Registro
     </button>
 </form>
