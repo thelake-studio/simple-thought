@@ -1,39 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Objetivo{% endblock %}
+{% block title %}Editar Objetivo - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ path('app_goal_index') }}" class="btn btn-link text-decoration-none text-muted ps-0">
-                    <i class="bi bi-arrow-left"></i> Volver
+        <div class="col-12 col-lg-10 col-xl-8">
+
+            {# --- Cabecera --- #}
+            <header class="mb-4">
+                <a href="{{ path('app_goal_index') }}" class="text-decoration-none text-secondary small mb-3 d-inline-block" aria-label="Volver a mis objetivos">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Volver al listado
                 </a>
-                <h1 class="h3 mb-0 ms-2">✏️ Editar Objetivo</h1>
-            </div>
+                <h1 class="h3 fw-bold text-primary mb-1">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Editar Objetivo
+                </h1>
+                <p class="text-muted small mb-0">Modifica los parámetros de "{{ goal.name }}".</p>
+            </header>
 
-            {# Tarjeta principal de edición #}
-            <div class="card shadow-sm mb-5">
-                <div class="card-body p-4">
-                    {{ include('goal/_form.html.twig', {'button_label': 'Actualizar'}) }}
-                </div>
-            </div>
+            {# --- Formulario Principal --- #}
+            {% include 'goal/_form.html.twig' with {'button_label': 'Actualizar Cambios'} %}
 
-            {# Zona de Peligro #}
-            <div class="card border-danger">
-                <div class="card-header bg-danger text-white">
-                    <i class="bi bi-exclamation-triangle-fill"></i> Zona de Peligro
-                </div>
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <p class="mb-0 text-danger small">
-                        Esta acción borrará el objetivo y <strong>todo su historial</strong> permanentemente.
-                    </p>
-                    <div class="ms-3">
-                        {{ include('goal/_delete_form.html.twig') }}
+            {# --- Zona de Peligro (Eliminar) --- #}
+            <section class="mt-5 pt-4 border-top">
+                <h2 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Zona de Peligro</h2>
+                <div class="card border-0 bg-danger bg-opacity-10 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="h6 fw-bold text-danger mb-1">Borrar este objetivo</h3>
+                            <p class="text-danger small mb-0 opacity-75">Esta acción borrará el objetivo y <strong>todo su historial</strong> permanentemente.</p>
+                        </div>
+                        <div style="min-width: 200px;">
+                            {{ include('goal/_delete_form.html.twig') }}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
         </div>
     </div>

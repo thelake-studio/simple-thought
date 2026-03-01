@@ -1,23 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nuevo Objetivo{% endblock %}
+{% block title %}Nuevo Objetivo - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="d-flex align-items-center mb-4">
-                <a href="{{ path('app_goal_index') }}" class="btn btn-link text-decoration-none text-muted ps-0">
-                    <i class="bi bi-arrow-left"></i> Volver
-                </a>
-                <h1 class="h3 mb-0 ms-2">🎯 Definir Nuevo Objetivo</h1>
-            </div>
+        <div class="col-12 col-lg-10 col-xl-8">
 
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    {{ include('goal/_form.html.twig') }}
-                </div>
-            </div>
+            {# --- Cabecera --- #}
+            <header class="mb-4">
+                <a href="{{ path('app_goal_index') }}" class="text-decoration-none text-secondary small mb-3 d-inline-block" aria-label="Volver a mis objetivos">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Volver al listado
+                </a>
+                <h1 class="h3 fw-bold text-primary mb-1">
+                    <i class="fa-solid fa-bullseye me-2"></i>Definir Nuevo Objetivo
+                </h1>
+                <p class="text-muted small mb-0">Establece un nuevo hábito o meta para medir tu constancia.</p>
+            </header>
+
+            {# --- Formulario --- #}
+            {% include 'goal/_form.html.twig' with {'button_label': 'Crear Objetivo'} %}
+
         </div>
     </div>
 </div>

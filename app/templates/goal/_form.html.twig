@@ -1,55 +1,64 @@
-{{ form_start(form) }}
+{# --- Formulario de Objetivo --- #}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
 
-    <div class="row">
-        {# Nombre del Objetivo #}
-        <div class="col-12 mb-4">
-            {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-            {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Ej: Leer antes de dormir...'}}) }}
-            {{ form_errors(form.name) }}
-        </div>
-
-        {# Tipo de Objetivo (Radio Buttons) #}
-        <div class="col-md-6 mb-4">
-            <div class="card bg-light border-0 h-100">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold mb-3"><i class="bi bi-collection"></i> Tipo de Objetivo</h6>
-                    {# Renderizamos los radios con un loop para darles estilo o dejamos el widget por defecto #}
-                    {{ form_widget(form.type) }}
-                    <div class="form-text text-muted mt-2">
-                        <small><strong>Racha:</strong> Hábito binario (Lo hice / No lo hice).<br>
-                        <strong>Acumulativo:</strong> Sumar cantidades (pasos, páginas, litros).</small>
-                    </div>
-                    {{ form_errors(form.type) }}
-                </div>
+            {# --- Nombre del Objetivo --- #}
+            <div class="mb-5">
+                {{ form_label(form.name, 'Nombre de tu meta', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Leer antes de dormir, Beber 2L de agua...'}}) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.name) }}</div>
             </div>
-        </div>
 
-        {# Configuración Temporal #}
-        <div class="col-md-6 mb-4">
-            <div class="card bg-light border-0 h-100">
-                <div class="card-body">
-                    <h6 class="card-title fw-bold mb-3"><i class="bi bi-calendar-event"></i> Configuración</h6>
-
-                    <div class="mb-3">
-                        {{ form_label(form.period, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.period, {'attr': {'class': 'form-select'}}) }}
-                        {{ form_errors(form.period) }}
-                    </div>
-
-                    <div class="mb-0">
-                        {{ form_label(form.targetValue, null, {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.targetValue, {'attr': {'class': 'form-control'}}) }}
-                        <div class="form-text">Déjalo vacío si es solo mantener la racha.</div>
-                        {{ form_errors(form.targetValue) }}
+            <div class="row g-4 mb-4">
+                {# --- Tipo de Objetivo --- #}
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h3 class="h6 fw-bold text-primary mb-3"><i class="fa-solid fa-layer-group me-2"></i>Tipo de Objetivo</h3>
+                            {{ form_widget(form.type) }}
+                            <div class="form-text text-muted mt-3 small">
+                                <strong>Racha:</strong> Hábito diario de "Sí o No".<br>
+                                <strong>Acumulativo:</strong> Sumar cantidades (pasos, páginas, etc).
+                            </div>
+                            <div class="text-danger small mt-1">{{ form_errors(form.type) }}</div>
+                        </div>
                     </div>
                 </div>
+
+                {# --- Configuración Temporal --- #}
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h3 class="h6 fw-bold text-primary mb-3"><i class="fa-solid fa-calendar-day me-2"></i>Configuración</h3>
+
+                            <div class="mb-3">
+                                {{ form_label(form.period, 'Frecuencia', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                                {{ form_widget(form.period, {'attr': {'class': 'form-select bg-white border-0 shadow-sm'}}) }}
+                                <div class="text-danger small mt-1">{{ form_errors(form.period) }}</div>
+                            </div>
+
+                            <div class="mb-0">
+                                {{ form_label(form.targetValue, 'Meta (Solo Acumulativo)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                                {{ form_widget(form.targetValue, {'attr': {'class': 'form-control bg-white border-0 shadow-sm', 'placeholder': 'Ej: 10000'}}) }}
+                                <div class="form-text small mt-1">Déjalo vacío si es de tipo Racha.</div>
+                                <div class="text-danger small mt-1">{{ form_errors(form.targetValue) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            {# --- Botonera de Acción --- #}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 mt-5 pt-3 border-top">
+                <a href="{{ path('app_goal_index') }}" class="btn btn-outline-secondary rounded-pill px-4" aria-label="Cancelar y volver al listado">
+                    Cancelar
+                </a>
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="submit">
+                    <i class="fa-solid fa-save me-2"></i>{{ button_label|default('Guardar Objetivo') }}
+                </button>
+            </div>
+
         </div>
     </div>
-
-    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
-        <a href="{{ path('app_goal_index') }}" class="btn btn-outline-secondary me-md-2">Cancelar</a>
-        <button class="btn btn-primary px-4">{{ button_label|default('Guardar Objetivo') }}</button>
-    </div>
-
 {{ form_end(form) }}
