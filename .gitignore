@@ -4,8 +4,6 @@
 /app/public/bundles/
 
 # Configuracion y Secretos
-.env
-.env.*
 /app/.env.local
 /app/.env.*.local
 
