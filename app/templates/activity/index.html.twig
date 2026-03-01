@@ -1,78 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mis Actividades{% endblock %}
+{% block title %}Mis Actividades - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-4">
+
+    {# --- Cabecera de la Vista --- #}
+    <header class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
         <div>
-            <h1 class="h3 text-success"><i class="fas fa-running"></i> Mis Actividades</h1>
-            <p class="text-muted small mb-0">Gestiona tus hábitos, deportes y tareas.</p>
+            <h1 class="h3 fw-bold text-primary mb-1">
+                <i class="fa-solid fa-person-running me-2"></i>Mis Actividades
+            </h1>
+            <p class="text-muted small mb-0">Gestiona tus hábitos, deportes y tareas diarias.</p>
         </div>
-        <a href="{{ path('app_activity_new') }}" class="btn btn-success text-white shadow-sm">
-            <i class="fas fa-plus"></i> Nueva Actividad
+        <a href="{{ path('app_activity_new') }}" class="btn btn-primary rounded-pill px-4 shadow-sm" aria-label="Crear una nueva actividad">
+            <i class="fa-solid fa-plus me-2"></i>Nueva Actividad
         </a>
-    </div>
+    </header>
 
-    {% if activities is empty %}
-        <div class="alert alert-light border text-center shadow-sm py-5">
-            <div class="text-success mb-3">
-                <i class="fas fa-dumbbell fa-3x"></i>
+    {# --- Contenido Principal --- #}
+    <section>
+        {% if activities is empty %}
+            {# --- Estado Vacío (Empty State) --- #}
+            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                <div class="card-body">
+                    <i class="fa-solid fa-dumbbell fa-3x text-secondary mb-3"></i>
+                    <h2 class="h5 fw-bold text-dark">¡A mover el esqueleto!</h2>
+                    <p class="text-muted mb-4">Aún no has registrado ninguna actividad.<br>Define qué haces en tu día a día (Trabajo, Gym, Leer...) para poder trackearlo luego.</p>
+                    <a href="{{ path('app_activity_new') }}" class="btn btn-primary rounded-pill px-4" aria-label="Crear mi primera actividad">
+                        Crear mi primera actividad
+                    </a>
+                </div>
             </div>
-            <h4 class="alert-heading">¡A mover el esqueleto!</h4>
-            <p class="mb-0">Aún no has registrado ninguna actividad.</p>
-            <p class="text-muted">Define qué haces en tu día a día (Trabajo, Gym, Leer...) para poder trackearlo luego.</p>
-            <a href="{{ path('app_activity_new') }}" class="btn btn-outline-success mt-3">Crear mi primera actividad</a>
-        </div>
-    {% else %}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {% for activity in activities %}
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 hover-effect">
-                        {# Cabecera con color dinámico #}
-                        <div class="card-header border-0 d-flex justify-content-between align-items-center text-white"
-                             style="background-color: {{ activity.color|default('#198754') }};">
-                            <h5 class="card-title mb-0 text-truncate">
-                                {% if activity.icon %}
-                                    <i class="{{ activity.icon }} me-1"></i>
+        {% else %}
+            {# --- Cuadrícula de Actividades --- #}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for activity in activities %}
+                    <div class="col">
+                        <div class="card h-100 border-0 shadow-sm rounded-4">
+
+                            {# Cabecera de Color Dinámico #}
+                            <div class="card-header border-0 rounded-top-4 py-3" style="background-color: {{ activity.color|default('#0d6efd') }};">
+                                <h3 class="h6 fw-bold text-white mb-0 text-truncate">
+                                    {% if activity.icon %}
+                                        <i class="{{ activity.icon }} me-2"></i>
+                                    {% endif %}
+                                    {{ activity.name }}
+                                </h3>
+                            </div>
+
+                            <div class="card-body">
+                                {% if activity.category %}
+                                    <span class="badge bg-light text-secondary border rounded-pill px-3 py-2 mb-3">
+                                        {{ activity.category }}
+                                    </span>
                                 {% endif %}
-                                {{ activity.name }}
-                            </h5>
-                        </div>
 
-                        <div class="card-body">
-                            {% if activity.category %}
-                                <span class="badge bg-light text-secondary border mb-2">
-                                    {{ activity.category }}
-                                </span>
-                            {% endif %}
+                                <p class="card-text text-muted small mb-0">
+                                    {% if activity.description %}
+                                        {{ activity.description|u.truncate(80, '...') }}
+                                    {% else %}
+                                        <span class="fst-italic">Sin descripción.</span>
+                                    {% endif %}
+                                </p>
+                            </div>
 
-                            <p class="card-text text-muted small">
-                                {% if activity.description %}
-                                    {{ activity.description|u.truncate(80, '...') }}
-                                {% else %}
-                                    <span class="fst-italic">Sin descripción.</span>
-                                {% endif %}
-                            </p>
-                        </div>
-
-                        <div class="card-footer bg-white border-top-0 text-end">
-                            <a href="{{ path('app_activity_show', {'id': activity.id}) }}" class="btn btn-sm btn-outline-primary" title="Ver detalle">
-                                <i class="fas fa-eye"></i>
-                            </a>
-                            <a href="{{ path('app_activity_edit', {'id': activity.id}) }}" class="btn btn-sm btn-outline-secondary" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            <div class="card-footer bg-white border-0 rounded-bottom-4 text-end pb-3 pe-3 pt-0">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ path('app_activity_show', {'id': activity.id}) }}" class="btn btn-sm btn-light text-primary rounded-circle" aria-label="Ver detalle de {{ activity.name }}" title="Ver detalle">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_activity_edit', {'id': activity.id}) }}" class="btn btn-sm btn-light text-secondary rounded-circle" aria-label="Editar {{ activity.name }}" title="Editar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
 </div>
-
-<style>
-    .hover-effect { transition: transform 0.2s; }
-    .hover-effect:hover { transform: translateY(-5px); }
-</style>
 {% endblock %}

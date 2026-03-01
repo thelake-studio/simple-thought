@@ -1,33 +1,33 @@
-{# templates/tag/_form.html.twig #}
+{# --- Formulario de Etiqueta --- #}
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
 
-            <div class="row align-items-center">
-                {# Columna grande para el nombre #}
-                <div class="col-md-9 mb-3">
-                    {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Urgente, Reflexión, Salud...'}}) }}
-                    {{ form_errors(form.name) }}
+            {# --- Campos Principales --- #}
+            <div class="row g-4 mb-4">
+                <div class="col-md-9">
+                    {{ form_label(form.name, 'Nombre de la Etiqueta', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Urgente, Reflexión, Salud...'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.name) }}</div>
                 </div>
 
-                {# Columna pequeña para el selector de color #}
-                <div class="col-md-3 mb-3">
-                    {{ form_label(form.color, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100', 'title': 'Elige un color para esta etiqueta'}}) }}
-                    {{ form_errors(form.color) }}
+                <div class="col-md-3">
+                    {{ form_label(form.color, 'Color', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100 bg-light border-0 shadow-sm', 'title': 'Elige un color para esta etiqueta'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.color) }}</div>
                 </div>
             </div>
 
-            {# Botonera #}
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3 pt-3 border-top">
-                <a href="{{ path('app_tag_index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-times"></i> Cancelar
+            {# --- Botonera de Acción --- #}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 mt-5 pt-3 border-top">
+                <a href="{{ path('app_tag_index') }}" class="btn btn-outline-secondary rounded-pill px-4" aria-label="Cancelar y volver al listado">
+                    Cancelar
                 </a>
-                <button class="btn btn-primary px-4">
-                    <i class="fas fa-save"></i> {{ button_label|default('Guardar Etiqueta') }}
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="submit">
+                    <i class="fa-solid fa-save me-2"></i>{{ button_label|default('Guardar Etiqueta') }}
                 </button>
             </div>
+
         </div>
     </div>
 {{ form_end(form) }}

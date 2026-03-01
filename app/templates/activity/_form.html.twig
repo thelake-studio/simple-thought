@@ -1,62 +1,63 @@
-{# templates/activity/_form.html.twig #}
+{# --- Formulario de Actividad --- #}
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            {# Fila 1: Datos Principales #}
-            <div class="row">
-                <div class="col-md-8 mb-3">
-                    {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.name, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Gimnasio, Leer, Curso de Symfony...'}}) }}
-                    {{ form_errors(form.name) }}
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+
+            {# --- Fila 1: Datos Principales --- #}
+            <div class="row g-4 mb-4">
+                <div class="col-md-8">
+                    {{ form_label(form.name, 'Nombre de la Actividad', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.name, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Gimnasio, Leer, Curso de Symfony...'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.name) }}</div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    {{ form_label(form.category, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.category, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Salud, Ocio'}}) }}
-                    {{ form_errors(form.category) }}
+                <div class="col-md-4">
+                    {{ form_label(form.category, 'Categoría', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.category, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Salud, Ocio'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.category) }}</div>
                 </div>
             </div>
 
-            {# Fila 2: Descripción #}
-            <div class="mb-3">
-                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 3}}) }}
-                <div class="form-text">Añade detalles opcionales para recordar en qué consiste.</div>
-                {{ form_errors(form.description) }}
+            {# --- Fila 2: Descripción --- #}
+            <div class="mb-4">
+                {{ form_label(form.description, 'Descripción (Opcional)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control bg-light border-0', 'rows': 3, 'placeholder': 'Añade detalles opcionales para recordar en qué consiste.'}}) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.description) }}</div>
             </div>
 
-            <hr class="my-4 text-muted">
+            <hr class="my-4 text-muted opacity-25">
 
-            {# Fila 3: Aspecto Visual #}
-            <h6 class="text-muted mb-3 text-uppercase small ls-1">Personalización Visual</h6>
-            <div class="row align-items-center">
-                <div class="col-md-2 mb-3">
-                    {{ form_label(form.color, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100', 'title': 'Elige un color'}}) }}
-                    {{ form_errors(form.color) }}
+            {# --- Fila 3: Aspecto Visual --- #}
+            <h2 class="h6 text-muted mb-3 text-uppercase small fw-bold" style="letter-spacing: 1px;">Personalización Visual</h2>
+            <div class="row g-4 align-items-center mb-4">
+                <div class="col-md-3 col-lg-2">
+                    {{ form_label(form.color, 'Color', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.color, {'attr': {'class': 'form-control form-control-color w-100 bg-light border-0 shadow-sm', 'title': 'Elige un color'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.color) }}</div>
                 </div>
 
-                <div class="col-md-10 mb-3">
-                    {{ form_label(form.icon, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                <div class="col-md-9 col-lg-10">
+                    {{ form_label(form.icon, 'Icono (FontAwesome)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
                     <div class="input-group">
-                        <span class="input-group-text bg-light"><i class="fas fa-icons text-muted"></i></span>
-                        {{ form_widget(form.icon, {'attr': {'class': 'form-control', 'placeholder': 'Ej: fa-solid fa-person-running'}}) }}
+                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-icons text-muted"></i></span>
+                        {{ form_widget(form.icon, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: fa-solid fa-person-running'}}) }}
                     </div>
-                    <div class="form-text small">
-                        Copia clases de <a href="https://fontawesome.com/search?o=r&m=free" target="_blank">FontAwesome</a>.
+                    <div class="form-text small text-muted mt-1">
+                        Copia clases de <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="text-primary text-decoration-none">FontAwesome</a>.
                     </div>
-                    {{ form_errors(form.icon) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.icon) }}</div>
                 </div>
             </div>
 
-            {# Botonera #}
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
-                <a href="{{ path('app_activity_index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-times"></i> Cancelar
+            {# --- Botonera de Acción --- #}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 mt-5 pt-3 border-top">
+                <a href="{{ path('app_activity_index') }}" class="btn btn-outline-secondary rounded-pill px-4" aria-label="Cancelar y volver al listado">
+                    Cancelar
                 </a>
-                <button class="btn btn-success px-4 text-white">
-                    <i class="fas fa-save"></i> {{ button_label|default('Guardar Actividad') }}
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="submit">
+                    <i class="fa-solid fa-save me-2"></i>{{ button_label|default('Guardar Actividad') }}
                 </button>
             </div>
+
         </div>
     </div>
 {{ form_end(form) }}

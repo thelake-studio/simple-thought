@@ -4,11 +4,11 @@ import Chart from 'chart.js/auto';
 /**
  * Controlador de Stimulus encargado de inicializar y renderizar los gráficos de Chart.js.
  * Permite crear gráficos dinámicos (líneas, barras, donut, etc.) pasando los datos
- * a través de atributos HTML (data-chart-chart-data-value).
+ * a través de atributos HTML (data-chart-datos-value).
  */
 export default class extends Controller {
     static values = {
-        chartData: Object,
+        datos: Object,
         type: { type: String, default: 'line' }
     }
 
@@ -35,7 +35,7 @@ export default class extends Controller {
 
         new Chart(this.element, {
             type: this.typeValue,
-            data: this.chartDataValue,
+            data: this.datosValue,
             options: chartOptions
         });
     }

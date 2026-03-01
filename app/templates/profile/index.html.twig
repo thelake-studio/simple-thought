@@ -3,40 +3,64 @@
 {% block title %}Mi Perfil - Simple Thought{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container-fluid py-4">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fa-solid fa-user text-primary me-2"></i> Mi Cuenta</h4>
-                    <a href="{{ path('app_profile_edit') }}" class="btn btn-sm btn-outline-primary">
-                        <i class="fa-solid fa-pen"></i> Editar
+        <div class="col-12 col-lg-10 col-xl-8">
+
+            {# --- Cabecera y Navegación --- #}
+            <header class="mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <h1 class="h3 fw-bold text-primary mb-1">
+                        <i class="fa-solid fa-user-circle me-2"></i>Mi Perfil
+                    </h1>
+                    <p class="text-muted small mb-0">Gestiona tu información personal y los datos de tu cuenta.</p>
+                </div>
+                <div>
+                    <a href="{{ path('app_profile_edit') }}" class="btn btn-primary rounded-pill px-4 shadow-sm w-100 w-md-auto text-nowrap" aria-label="Editar mi perfil">
+                        <i class="fa-solid fa-pen me-2"></i>Editar Datos
                     </a>
                 </div>
-                <div class="card-body p-4">
-                    <ul class="list-group list-group-flush mb-4">
-                        <li class="list-group-item px-0">
-                            <span class="text-muted d-block small">¿Cómo te llamamos?</span>
-                            <span class="fs-5 fw-bold">{{ user.nickname }}</span>
-                        </li>
-                        <li class="list-group-item px-0">
-                            <span class="text-muted d-block small">Correo Electrónico</span>
-                            <span class="fs-5">{{ user.email }}</span>
-                        </li>
-                    </ul>
+            </header>
 
-                    <hr class="mb-4">
+            {# --- Tarjeta de Detalles --- #}
+            <div class="card border-0 shadow-sm rounded-4 mb-5">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="h6 text-secondary text-uppercase fw-bold mb-4 small" style="letter-spacing: 1px;">Información de la Cuenta</h2>
 
-                    <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded border border-danger border-opacity-25">
-                        <div>
-                            <h6 class="text-danger mb-1"><i class="fa-solid fa-triangle-exclamation"></i> Zona de Peligro</h6>
-                            <p class="text-muted small mb-0">Esta acción es irreversible y borrará todo tu diario.</p>
-                        </div>
+                    <dl class="row g-4 mb-0">
+                        <dt class="col-sm-4 text-muted fw-semibold d-flex align-items-center">
+                            ¿Cómo te llamamos?
+                        </dt>
+                        <dd class="col-sm-8 text-dark fs-5 fw-bold mb-0">
+                            {{ user.nickname }}
+                        </dd>
 
-                        {{ include('profile/_delete_form.html.twig') }}
-                    </div>
+                        <dt class="col-sm-4 text-muted fw-semibold d-flex align-items-center">
+                            Correo Electrónico
+                        </dt>
+                        <dd class="col-sm-8 text-dark fs-5 mb-0">
+                            {{ user.email }}
+                        </dd>
+                    </dl>
                 </div>
             </div>
+
+            {# --- Zona de Peligro (Eliminar) --- #}
+            <section class="mt-5 pt-4 border-top">
+                <h2 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Zona de Peligro</h2>
+                <div class="card border-0 bg-danger bg-opacity-10 rounded-4">
+                    <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                        <div>
+                            <h3 class="h6 fw-bold text-danger mb-1">Borrar mi cuenta</h3>
+                            <p class="text-danger small mb-0 opacity-75">Esta acción es irreversible y borrará todo tu diario, objetivos e historial de progreso para siempre.</p>
+                        </div>
+                        <div style="min-width: 200px;">
+                            {{ include('profile/_delete_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </div>
     </div>
 </div>
