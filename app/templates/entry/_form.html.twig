@@ -1,80 +1,88 @@
-{# templates/entry/_form.html.twig #}
-
+{# --- Formulario de Entrada de Diario --- #}
 {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
 
-            <div class="row mb-4">
-                {# Fecha #}
-                <div class="col-md-4 mb-3 mb-md-0">
-                    {{ form_label(form.date, null, {'label_attr': {'class': 'fw-bold text-muted small text-uppercase'}}) }}
-                    {{ form_widget(form.date) }}
-                    {{ form_errors(form.date) }}
+            {# --- Fila 1: Fecha y Emoción --- #}
+            <div class="row g-4 mb-4">
+                <div class="col-md-5">
+                    {{ form_label(form.date, 'Fecha', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                    {{ form_widget(form.date, {'attr': {'class': 'form-control form-control-lg bg-light border-0'}}) }}
+                    <div class="text-danger small mt-1">{{ form_errors(form.date) }}</div>
                 </div>
 
-                <div class="col-md-8">
-                    {{ form_label(form.emotion, null, {'label_attr': {'class': 'fw-bold text-muted small text-uppercase'}}) }}
+                <div class="col-md-7">
+                    {{ form_label(form.emotion, 'Emoción Principal', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
                     <div class="input-group">
-                        <span class="input-group-text bg-white"><i class="fas fa-heart"></i></span>
-                        {{ form_widget(form.emotion, {'attr': {'class': 'form-select'}}) }}
+                        <span class="input-group-text bg-light border-0"><i class="fa-solid fa-heart-pulse text-muted"></i></span>
+                        {{ form_widget(form.emotion, {'attr': {'class': 'form-select form-select-lg bg-light border-0'}}) }}
                     </div>
-                    {{ form_errors(form.emotion) }}
-                    <div class="form-text small">Selecciona la emoción predominante de hoy.</div>
+                    <div class="form-text small text-muted mt-1">¿Cómo te sientes hoy en general?</div>
+                    <div class="text-danger small mt-1">{{ form_errors(form.emotion) }}</div>
                 </div>
             </div>
 
-            <div class="mb-3">
-                {{ form_label(form.title, null, {'label_attr': {'class': 'fw-bold'}}) }}
-                {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Ponle un título a tu día (Opcional)'}}) }}
-                {{ form_errors(form.title) }}
-            </div>
-
+            {# --- Fila 2: Título --- #}
             <div class="mb-4">
-                {{ form_label(form.content, null, {'label_attr': {'class': 'fw-bold'}}) }}
-                {{ form_widget(form.content, {'attr': {'class': 'form-control', 'style': 'min-height: 150px;', 'placeholder': 'Escribe aquí libremente...'}}) }}
-                {{ form_errors(form.content) }}
+                {{ form_label(form.title, 'Título (Opcional)', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                {{ form_widget(form.title, {'attr': {'class': 'form-control form-control-lg bg-light border-0', 'placeholder': 'Ej: Un día muy productivo, Reflexiones nocturnas...'}}) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.title) }}</div>
             </div>
 
-            <hr class="text-muted my-4">
+            {# --- Fila 3: Contenido Principal --- #}
+            <div class="mb-5">
+                {{ form_label(form.content, 'Querido diario...', {'label_attr': {'class': 'form-label fw-semibold text-secondary small'}}) }}
+                {{ form_widget(form.content, {'attr': {'class': 'form-control bg-light border-0', 'style': 'min-height: 200px;', 'placeholder': 'Escribe aquí libremente lo que tienes en la cabeza...'}}) }}
+                <div class="text-danger small mt-1">{{ form_errors(form.content) }}</div>
+            </div>
 
-            <div class="row">
-                {# Columna Izquierda: Actividades #}
-                <div class="col-md-6 mb-4">
-                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-running"></i> ¿Qué has hecho?</h6>
-                    <div class="card bg-light border-0">
-                        <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                            {{ form_widget(form.activities) }}
+            <h3 class="h6 text-muted mb-3 text-uppercase small fw-bold" style="letter-spacing: 1px;">Contexto Adicional</h3>
 
-                            {% if form.activities.vars.choices is empty %}
-                                <div class="text-muted small fst-italic">No has creado actividades aún.</div>
-                            {% endif %}
+            {# --- Fila 4: Actividades y Etiquetas --- #}
+            <div class="row g-4 mb-4">
+                {# Actividades #}
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h4 class="h6 fw-bold text-primary mb-3"><i class="fa-solid fa-person-running me-2"></i>Actividades</h4>
+                            <div style="max-height: 200px; overflow-y: auto;" class="pe-2">
+                                {{ form_widget(form.activities) }}
+                                {% if form.activities.vars.choices is empty %}
+                                    <p class="text-muted small fst-italic mb-0">No has creado actividades aún.</p>
+                                {% endif %}
+                            </div>
+                            <div class="text-danger small mt-1">{{ form_errors(form.activities) }}</div>
                         </div>
                     </div>
                 </div>
 
-                {# Columna Derecha: Etiquetas #}
-                <div class="col-md-6 mb-4">
-                    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-tags"></i> Etiquetas</h6>
-                    <div class="card bg-light border-0">
-                        <div class="card-body" style="max-height: 200px; overflow-y: auto;">
-                            {{ form_widget(form.tags) }}
-
-                            {% if form.tags.vars.choices is empty %}
-                                <div class="text-muted small fst-italic">No has creado etiquetas aún.</div>
-                            {% endif %}
+                {# Etiquetas #}
+                <div class="col-md-6">
+                    <div class="card bg-light border-0 rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <h4 class="h6 fw-bold text-primary mb-3"><i class="fa-solid fa-tags me-2"></i>Etiquetas</h4>
+                            <div style="max-height: 200px; overflow-y: auto;" class="pe-2">
+                                {{ form_widget(form.tags) }}
+                                {% if form.tags.vars.choices is empty %}
+                                    <p class="text-muted small fst-italic mb-0">No has creado etiquetas aún.</p>
+                                {% endif %}
+                            </div>
+                            <div class="text-danger small mt-1">{{ form_errors(form.tags) }}</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
-                <a href="{{ path('app_entry_index') }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-times"></i> Cancelar
+            {# --- Botonera de Acción --- #}
+            <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3 mt-5 pt-4 border-top">
+                <a href="{{ path('app_entry_index') }}" class="btn btn-outline-secondary rounded-pill px-4" aria-label="Cancelar y volver al diario">
+                    Cancelar
                 </a>
-                <button class="btn btn-primary px-4 shadow-sm">
-                    <i class="fas fa-save"></i> {{ button_label|default('Guardar en mi Diario') }}
+                <button class="btn btn-primary rounded-pill px-4 shadow-sm" type="submit">
+                    <i class="fa-solid fa-save me-2"></i>{{ button_label|default('Guardar Entrada') }}
                 </button>
             </div>
+
         </div>
     </div>
 {{ form_end(form) }}
