@@ -69,6 +69,12 @@
                                             <i class="fa-solid fa-bullseye me-2"></i>Mis Objetivos
                                         </a>
                                     </li>
+                                    {# Acceso a Estadísticas #}
+                                    <li class="nav-item">
+                                        <a href="{{ path('app_stats_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_stats' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mis estadísticas">
+                                            <i class="fa-solid fa-chart-line me-2"></i>Estadísticas
+                                        </a>
+                                    </li>
                                     {# Acceso al Perfil #}
                                     <li class="nav-item">
                                         <a href="{{ path('app_profile_index') }}" class="nav-link fw-semibold rounded-3 {% if 'app_profile' in app.request.attributes.get('_route')|default('') %}bg-primary text-white{% else %}text-secondary bg-light{% endif %}" aria-label="Ir a mi perfil">
